@@ -13,8 +13,8 @@ const fadeUp = {
 const entries = [
   {
     to: '/handbook', k: 'HANDBOOK · 01', icon: Library, title: '建模与控制手册',
-    desc: '12 阶，从「开关电源在控什么」一路走到 MPC。每章一句话直觉 + 核心公式 + 对照表 + 常见误区 + 两道自测，末尾标出知识库出处。嫌长篇太厚，从这本开始。',
-    status: '已上线 · 12 阶',
+    desc: '19 阶、5 个阶段：前 12 阶从「开关电源在控什么」一路走到 MPC，后 7 阶讲工程落地——电感、输入滤波器、保护、测量、谐振、PFC、多相。每章一句话直觉 + 核心公式 + 对照表 + 常见误区 + 两道自测，末尾标出知识库出处。嫌长篇太厚，从这本开始。',
+    status: '已上线 · 19 阶',
   },
   {
     to: '/learn/s-to-z', k: 'TRAINING · 01', icon: BookOpen, title: '从 S 变换到 Z 变换',
@@ -78,7 +78,7 @@ export default function Home() {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 pb-8">
-        <div className="section-h"><h2>三个入口</h2><div className="line" /></div>
+        <div className="section-h"><h2>从哪里开始</h2><div className="line" /></div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {entries.map((e, i) => (
             <motion.div key={e.to} custom={i} initial={initialState} animate="visible" variants={fadeUp}>
@@ -113,8 +113,8 @@ export default function Home() {
 
         <div className="section-h" id="scope"><h2>本轮预览的范围</h2><div className="line" /></div>
         <div className="card-surface p-6">
-          <p className="text-text-secondary leading-relaxed"><strong className="text-text-primary">已经做的：</strong>手册 12 阶（建模与控制的完整主线）、S→Z 长篇专题 1 篇（逐条公式溯源）、Tustin 计算器 1 个（内核可单独复核）。</p>
-          <p className="text-text-secondary leading-relaxed mt-3"><strong className="text-text-primary">还没做的，如实写在这里：</strong>知识库 20,596 条公式只用到约 90 条，7,522 张书内插图一张未用，43 本书只覆盖到 4 个领域的骨架；跨书检索（17,292 块）尚未开放成可交互页面。这些不是「即将上线」，是没有排期。</p>
+          <p className="text-text-secondary leading-relaxed"><strong className="text-text-primary">已经做的：</strong>手册 19 阶 / 5 个阶段（建模与控制的完整主线，加工程落地 7 章）、S→Z 长篇专题 1 篇（逐条公式溯源）、Tustin 计算器 1 个（内核可单独复核）。</p>
+          <p className="text-text-secondary leading-relaxed mt-3"><strong className="text-text-primary">还没做的，如实写在这里：</strong>知识库 20,596 条公式只用到约 120 条，7,522 张书内插图一张未用；EMI 整改与热设计库里没有专书，这两章直接空着没写；跨书检索（17,292 块）尚未开放成可交互页面。这些不是「即将上线」，是没有排期。</p>
           <div className="mt-5 pt-5 border-t border-border text-sm text-text-muted leading-relaxed">
             技术栈与站群一致：Vite + React + TypeScript + Tailwind CSS；公式由 KaTeX 本地打包，无 CDN 依赖；
             计算内核为独立模块，页面与内核可分别复核。
