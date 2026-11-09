@@ -27,6 +27,11 @@ const changelog = fs.readFileSync(ci >= 0 ? argv[ci + 1] : path.join(root, 'CHAN
 const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'))
 const REPO = 'WisdomHuang2020/control-mode'
 
+// 全脚本统一用「不带 v」的裸版本串：CHANGELOG 捕获组、package.json、远端 tag、
+// GitHub Release 一律先过 normVer，再参与集合比较与排序。
+// 否则 Number('v1') === NaN 会让 semverCmp 失真，远端 tag 也永远匹配不上 expected。
+const normVer = (s) => String(s).replace(/^v/, '')
+
 const semverCmp = (a, b) => {
   const x = a.split('.').map(Number), y = b.split('.').map(Number)
   for (let i = 0; i < 3; i++) if (x[i] !== y[i]) return x[i] - y[i]
@@ -54,13 +59,15 @@ try {
     cwd: root, encoding: 'utf8', timeout: 30000,
     env: { ...process.env, GIT_TERMINAL_PROMPT: '0' },
   })
-  tags = [...out.matchAll(/refs\/tags\/(v\d+\.\d+\.\d+)(?:\^\{\})?$/gm)].map((m) => m[1])
+  // ^{} 是 annotated tag 的解引用行，去重后与 refs/tags/... 指向同一版本。
+  tags = [...out.matchAll(/refs\/tags\/(v\d+\.\d+\.\d+)(?:\^\{\})?$/gm)].map((m) => normVer(m[1]))
   tags = [...new Set(tags)]
   facts.push(['远端 tag', tags.length ? `${tags.length} 个，顶端 v${[...tags].sort(semverCmp).at(-1)}` : '（空）'])
 } catch (e) {
   incomplete.push(`远端 tag 读取失败：${e.message.split('\n')[0]}`)
   facts.push(['远端 tag', '（未能读取）'])
 }
+const tagReadFailed = incomplete.some((s) => s.includes('远端 tag'))
 
 // ④ GitHub Releases（匿名可读；限流则标记「未能完整审计」）
 let releases = []
@@ -74,7 +81,7 @@ try {
   if (!Array.isArray(data)) {
     incomplete.push(`GitHub Releases 接口未返回列表：${typeof data === 'object' ? data.message : out.slice(0, 80)}`)
   } else {
-    releases = data.map((r) => String(r.tag_name).replace(/^v/, ''))
+    releases = data.map((r) => normVer(r.tag_name))
     facts.push(['GitHub Release', releases.length ? `${releases.length} 个` : '（空）'])
   }
 } catch (e) {
@@ -85,8 +92,10 @@ if (releases.length === 0 && !incomplete.some((s) => s.includes('Releases'))) {
 }
 
 // 集合一致（两个方向含义不同）
+// 注意：tags 读取「成功但为空」也是缺口，不能因为长度为 0 就静默放行；
+// 只有读取失败（已记入 incomplete、脚本会退 3）才跳过这一向的判定。
 for (const v of expected) {
-  if (tags.length && !tags.includes(v)) errors.push(`CHANGELOG 有 v${v} 但远端无 tag（漏推 tag）`)
+  if (!tagReadFailed && !tags.includes(v)) errors.push(`CHANGELOG 有 v${v} 但远端无 tag（漏推 tag）`)
   if (!incomplete.some((s) => s.includes('Releases')) && !releases.includes(v)) errors.push(`CHANGELOG 有 v${v} 但无 Release（tag 推送不会自动建 Release）`)
 }
 for (const v of tags) if (!expected.includes(v)) errors.push(`远端 tag v${v} 不在 CHANGELOG（漏写条目或误打标签）`)
