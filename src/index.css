@@ -27,11 +27,12 @@
    契约：?theme= 优先 → localStorage['pk-theme'] → 默认 dark-teal；
    根元素 data-theme 驱动，首屏防闪脚本在 index.html。
    站群用 --color-brand*，本站用 --color-primary*，此处做同名映射。
-   --color-accent（amber）是工程强调色，不随主题变化。 ── */
+   --color-accent（amber）在深色主题下不随主题变化；浅色主题因为要把 amber 当文字用，
+   会在下面的「可读性补丁」里压深一档。 ── */
 html[data-theme='blue'] {
   --color-bg: #f6f7f9; --color-surface: #fff; --color-surface-elevated: #fcfcfd;
   --color-border: #d3d9e0; --color-border-light: #e4e7eb;
-  --color-text-primary: #14171c; --color-text-secondary: #4b535e; --color-text-muted: #6b7480;
+  --color-text-primary: #14171c; --color-text-secondary: #4b535e; --color-text-muted: #5f6873;
   --color-primary: #0070c0; --color-primary-light: #0060b0; --color-primary-dark: #0050a0;
 }
 html[data-theme='dark-teal'] {
@@ -49,14 +50,14 @@ html[data-theme='navy-tech'] {
 html[data-theme='graphite'] {
   --color-bg: #f2f3f5; --color-surface: #fff; --color-surface-elevated: #fafbfc;
   --color-border: #c9ced5; --color-border-light: #e0e3e8;
-  --color-text-primary: #1b2027; --color-text-secondary: #4d5661; --color-text-muted: #78818c;
+  --color-text-primary: #1b2027; --color-text-secondary: #4d5661; --color-text-muted: #666f7a;
   --color-primary: #3f4855; --color-primary-light: #5b6675; --color-primary-dark: #2c333d;
 }
 html[data-theme='warm-paper'] {
   --color-bg: #faf6ed; --color-surface: #fffdf7; --color-surface-elevated: #fbf6e9;
   --color-border: #dcd0b6; --color-border-light: #eae0c9;
-  --color-text-primary: #2e2519; --color-text-secondary: #5e5140; --color-text-muted: #8a7a63;
-  --color-primary: #9a5b13; --color-primary-light: #b8761f; --color-primary-dark: #7a4710;
+  --color-text-primary: #2e2519; --color-text-secondary: #5e5140; --color-text-muted: #776750;
+  --color-primary: #9a5b13; --color-primary-light: #8f5810; --color-primary-dark: #7a4710;
 }
 html[data-theme='forest'] {
   --color-bg: #0c1712; --color-surface: #14241b; --color-surface-elevated: #1d3226;
@@ -67,15 +68,46 @@ html[data-theme='forest'] {
 html[data-theme='indigo'] {
   --color-bg: #f6f5fc; --color-surface: #fff; --color-surface-elevated: #fbfaff;
   --color-border: #d6d1e8; --color-border-light: #e7e3f2;
-  --color-text-primary: #211d33; --color-text-secondary: #524c6b; --color-text-muted: #7e7899;
-  --color-primary: #5b4bd6; --color-primary-light: #7869e8; --color-primary-dark: #4538ad;
+  --color-text-primary: #211d33; --color-text-secondary: #524c6b; --color-text-muted: #6a6386;
+  --color-primary: #5b4bd6; --color-primary-light: #5142c4; --color-primary-dark: #4538ad;
 }
 html[data-theme='sea-salt'] {
   --color-bg: #eef7f7; --color-surface: #fff; --color-surface-elevated: #f8fdfd;
   --color-border: #c4dcda; --color-border-light: #dceae9;
-  --color-text-primary: #123033; --color-text-secondary: #416064; --color-text-muted: #6e8b8d;
-  --color-primary: #0e7490; --color-primary-light: #1294b0; --color-primary-dark: #0a566c;
+  --color-text-primary: #123033; --color-text-secondary: #416064; --color-text-muted: #5c7577;
+  --color-primary: #0e7490; --color-primary-light: #0b6f86; --color-primary-dark: #0a566c;
 }
+
+/* ── 浅色主题的可读性补丁（脚本化迁移时漏掉的一层）───────────────────────
+   站群原值是按深色底调的；直接搬到白底上，有两处会「看不见」，都是实测出来的：
+
+   ① `.callout.* .lbl` 与 `.chip.on` 是「--color-primary-dark 作底色 +
+      --color-primary-light 作文字」。深色主题下 dark 是深墨绿、light 是亮青，对比够；
+      可浅色主题里两者都被调成了同向的深蓝（#0050a0 底 + #0060b0 字），
+      实测对比度约 1.1:1 —— 工具页的选中档位、教学页「结论/记法」标签全是隐形块。
+      → 浅色下把 primary-dark 翻过来当「浅底」用（语义与深色主题相反，这是要点）。
+
+   ② accent / accent-light 是 amber 系，作**文字**用在 `.tag.s`、`.callout.warn`
+      上是 #fbbf24 压白底，约 1.6:1；连图表里的 Nyquist 参考线也会发虚。
+      → 浅色下整体压深一档（#b45309 / #92400e），底色不变、只是把亮度让出来。
+
+   success / danger 同理换深一档。深色主题不受任何影响：本段只作用于浅色 id。 */
+html[data-theme='blue'],
+html[data-theme='graphite'],
+html[data-theme='warm-paper'],
+html[data-theme='indigo'],
+html[data-theme='sea-salt'] {
+  --color-accent: #b45309;
+  --color-accent-light: #92400e;
+  --color-success: #15803d;
+  --color-danger: #b91c1c;
+}
+html[data-theme='blue'] { --color-primary-dark: #dbeafe; }
+html[data-theme='graphite'] { --color-primary-dark: #e2e5e9; }
+html[data-theme='warm-paper'] { --color-primary-dark: #f0e2c8; }
+html[data-theme='indigo'] { --color-primary-dark: #e4e0f7; }
+html[data-theme='sea-salt'] { --color-primary-dark: #d4e9ea; }
+
 
 @layer base {
   html { scroll-behavior: smooth; }
@@ -106,7 +138,7 @@ html[data-theme='sea-salt'] {
   .math-block:hover {
     border-color: var(--color-primary-light);
     background-color: var(--color-surface-elevated);
-    box-shadow: 0 0 0 1px rgba(20, 184, 166, .12);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-primary-light) 12%, transparent);
     scrollbar-width: thin;
   }
   .math-block:hover::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
@@ -132,7 +164,7 @@ html[data-theme='sea-salt'] {
   .card-surface:hover {
     border-color: var(--color-primary-light);
     background-color: var(--color-surface-elevated);
-    box-shadow: 0 0 0 1px rgba(20, 184, 166, .08);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-primary-light) 8%, transparent);
   }
   .input-field {
     background-color: var(--color-surface);
@@ -147,7 +179,7 @@ html[data-theme='sea-salt'] {
   .input-field:focus {
     outline: none;
     border-color: var(--color-primary-light);
-    box-shadow: 0 0 0 2px rgba(15, 118, 110, .2);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 20%, transparent);
   }
   .input-field::placeholder { color: var(--color-text-muted); }
 
@@ -199,15 +231,17 @@ html[data-theme='sea-salt'] {
   .callout { border: 1px solid var(--color-border); border-left-width: 3px; border-radius: 0 8px 8px 0; background: var(--color-surface); padding: 1rem 1.25rem; margin: 1.4rem 0; }
   .callout .lbl { display: inline-block; font-family: var(--font-mono); font-size: .7rem; letter-spacing: .1em; padding: .15rem .5rem; border-radius: 4px; margin-bottom: .5rem; }
   .callout p { margin: .35rem 0; font-size: .9rem; line-height: 1.85; color: var(--color-text-secondary); }
-  .callout.key { border-left-color: var(--color-primary-light); } .callout.key .lbl { background: var(--color-primary-dark); color: var(--color-primary-light); }
-  .callout.note { border-left-color: var(--color-primary); } .callout.note .lbl { background: var(--color-primary-dark); color: var(--color-primary-light); }
-  .callout.ok { border-left-color: var(--color-success); } .callout.ok .lbl { background: rgba(34,197,94,.15); color: var(--color-success); }
-  .callout.warn { border-left-color: var(--color-accent); } .callout.warn .lbl { background: rgba(245,158,11,.15); color: var(--color-accent-light); }
+  /* 标签底色不用实心 primary-dark：深色主题下那是「深底+亮字」，浅色主题下同一对变量会变成
+     「深底+深字」。改用 primary 的半透明薄涂层，8 套主题都能保证标签字压在浅一档的底上。 */
+  .callout.key { border-left-color: var(--color-primary-light); } .callout.key .lbl { background: color-mix(in srgb, var(--color-primary) 16%, transparent); color: var(--color-primary-light); }
+  .callout.note { border-left-color: var(--color-primary); } .callout.note .lbl { background: color-mix(in srgb, var(--color-primary) 16%, transparent); color: var(--color-primary-light); }
+  .callout.ok { border-left-color: var(--color-success); } .callout.ok .lbl { background: color-mix(in srgb, var(--color-success) 16%, transparent); color: var(--color-success); }
+  .callout.warn { border-left-color: var(--color-accent); } .callout.warn .lbl { background: color-mix(in srgb, var(--color-accent) 16%, transparent); color: var(--color-accent-light); }
 
   .tag { font-size: .72rem; font-family: var(--font-mono); padding: .1rem .45rem; border-radius: 4px; white-space: nowrap; }
-  .tag.v { background: rgba(34,197,94,.15); color: var(--color-success); }
-  .tag.s { background: rgba(245,158,11,.15); color: var(--color-accent-light); }
-  .tag.x { background: rgba(239,68,68,.15); color: var(--color-danger); }
+  .tag.v { background: color-mix(in srgb, var(--color-success) 16%, transparent); color: var(--color-success); }
+  .tag.s { background: color-mix(in srgb, var(--color-accent) 16%, transparent); color: var(--color-accent-light); }
+  .tag.x { background: color-mix(in srgb, var(--color-danger) 16%, transparent); color: var(--color-danger); }
 
   .toc { position: sticky; top: 5.5rem; align-self: start; display: flex; flex-direction: column; gap: .15rem; min-width: 190px; }
   .toc .toc-t { font-family: var(--font-mono); font-size: .7rem; letter-spacing: .12em; color: var(--color-text-muted); margin-bottom: .5rem; }
@@ -223,7 +257,7 @@ html[data-theme='sea-salt'] {
   .field .hint { font-size: .74rem; color: var(--color-text-muted); }
   .chip { font-size: .8rem; padding: .35rem .8rem; border: 1px solid var(--color-border); border-radius: 99px; color: var(--color-text-secondary); background: var(--color-surface-elevated); }
   .chip:hover { border-color: var(--color-primary-light); color: var(--color-text-primary); }
-  .chip.on { border-color: var(--color-primary-light); background: var(--color-primary-dark); color: var(--color-primary-light); }
+  .chip.on { border-color: var(--color-primary-light); background: color-mix(in srgb, var(--color-primary) 16%, transparent); color: var(--color-primary-light); }
   .readout { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--color-border); border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; }
   .readout .ro { background: var(--color-surface); padding: .8rem 1rem; }
   .readout .ro .k { font-size: .72rem; color: var(--color-text-muted); }

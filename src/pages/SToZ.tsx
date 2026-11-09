@@ -16,7 +16,7 @@ const TOC = [
   ['s7', '07', '覆盖度说明'],
 ]
 
-/** s 平面 → z 平面的指数映射示意。颜色改为站群深色主题，几何与标签与原静态站一致。 */
+/** s 平面 → z 平面的指数映射示意。配色走 CSS 变量（随 8 套主题切换），几何与标签与原静态站一致。 */
 function MappingFigure() {
   return (
     <figure className="my-6">
@@ -24,52 +24,52 @@ function MappingFigure() {
         <svg viewBox="0 0 760 262" className="w-full min-w-[640px]" role="img" aria-label="s 平面到 z 平面的指数映射示意">
           <defs>
             <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
-              <path d="M0,0 L9,4.5 L0,9 z" fill="#14b8a6" />
+              <path d="M0,0 L9,4.5 L0,9 z" fill="var(--color-primary-light)" />
             </marker>
           </defs>
 
           {/* s 平面 */}
-          <rect x="30" y="30" width="230" height="200" fill="none" stroke="#404040" />
-          <rect x="30" y="30" width="115" height="200" fill="#134e4a" opacity="0.55" />
-          <line x1="30" y1="130" x2="260" y2="130" stroke="#737373" strokeWidth="1" />
-          <line x1="145" y1="30" x2="145" y2="230" stroke="#737373" strokeWidth="1" />
-          <text x="252" y="146" fontSize="12" fill="#a3a3a3" fontFamily="Georgia,serif" fontStyle="italic">σ</text>
-          <text x="151" y="44" fontSize="12" fill="#a3a3a3" fontFamily="Georgia,serif" fontStyle="italic">jω</text>
-          <text x="40" y="48" fontSize="12" fill="#737373">s 平面</text>
-          <text x="46" y="216" fontSize="11" fill="#14b8a6">稳定域</text>
+          <rect x="30" y="30" width="230" height="200" fill="none" stroke="var(--color-border)" />
+          <rect x="30" y="30" width="115" height="200" fill="var(--color-primary-dark)" opacity="0.55" />
+          <line x1="30" y1="130" x2="260" y2="130" stroke="var(--color-text-muted)" strokeWidth="1" />
+          <line x1="145" y1="30" x2="145" y2="230" stroke="var(--color-text-muted)" strokeWidth="1" />
+          <text x="252" y="146" fontSize="12" fill="var(--color-text-secondary)" fontFamily="Georgia,serif" fontStyle="italic">σ</text>
+          <text x="151" y="44" fontSize="12" fill="var(--color-text-secondary)" fontFamily="Georgia,serif" fontStyle="italic">jω</text>
+          <text x="40" y="48" fontSize="12" fill="var(--color-text-muted)">s 平面</text>
+          <text x="46" y="216" fontSize="11" fill="var(--color-primary-light)">稳定域</text>
 
-          <circle cx="100" cy="82" r="5" fill="#14b8a6" />
-          <circle cx="112" cy="176" r="5" fill="#14b8a6" />
-          <circle cx="200" cy="92" r="5" fill="#ef4444" />
-          <line x1="100" y1="82" x2="112" y2="176" stroke="#14b8a6" strokeWidth="1" strokeDasharray="3,3" opacity=".5" />
-          <text x="70" y="76" fontSize="10.5" fill="#14b8a6" fontFamily="monospace">s₁</text>
-          <text x="120" y="190" fontSize="10.5" fill="#14b8a6" fontFamily="monospace">s₁*</text>
-          <text x="208" y="86" fontSize="10.5" fill="#ef4444" fontFamily="monospace">s₂</text>
+          <circle cx="100" cy="82" r="5" fill="var(--color-primary-light)" />
+          <circle cx="112" cy="176" r="5" fill="var(--color-primary-light)" />
+          <circle cx="200" cy="92" r="5" fill="var(--color-danger)" />
+          <line x1="100" y1="82" x2="112" y2="176" stroke="var(--color-primary-light)" strokeWidth="1" strokeDasharray="3,3" opacity=".5" />
+          <text x="70" y="76" fontSize="10.5" fill="var(--color-primary-light)" fontFamily="monospace">s₁</text>
+          <text x="120" y="190" fontSize="10.5" fill="var(--color-primary-light)" fontFamily="monospace">s₁*</text>
+          <text x="208" y="86" fontSize="10.5" fill="var(--color-danger)" fontFamily="monospace">s₂</text>
 
           {/* 映射箭头 */}
-          <line x1="288" y1="130" x2="352" y2="130" stroke="#14b8a6" strokeWidth="1.6" markerEnd="url(#ar)" />
-          <text x="320" y="108" fontSize="15" fill="#14b8a6" textAnchor="middle" fontFamily="Georgia,serif" fontStyle="italic">
+          <line x1="288" y1="130" x2="352" y2="130" stroke="var(--color-primary-light)" strokeWidth="1.6" markerEnd="url(#ar)" />
+          <text x="320" y="108" fontSize="15" fill="var(--color-primary-light)" textAnchor="middle" fontFamily="Georgia,serif" fontStyle="italic">
             z = e<tspan fontSize="10" dy="-6">sT</tspan>
           </text>
-          <text x="320" y="154" fontSize="10.5" fill="#a3a3a3" textAnchor="middle">采样周期 T</text>
+          <text x="320" y="154" fontSize="10.5" fill="var(--color-text-secondary)" textAnchor="middle">采样周期 T</text>
 
           {/* z 平面 */}
-          <rect x="390" y="30" width="230" height="200" fill="none" stroke="#404040" />
-          <circle cx="505" cy="130" r="75" fill="#134e4a" opacity="0.55" />
-          <circle cx="505" cy="130" r="75" fill="none" stroke="#737373" strokeWidth="1.2" />
-          <line x1="390" y1="130" x2="620" y2="130" stroke="#404040" strokeWidth="1" />
-          <line x1="505" y1="30" x2="505" y2="230" stroke="#404040" strokeWidth="1" />
-          <text x="612" y="146" fontSize="12" fill="#a3a3a3" fontFamily="Georgia,serif" fontStyle="italic">Re</text>
-          <text x="511" y="44" fontSize="12" fill="#a3a3a3" fontFamily="Georgia,serif" fontStyle="italic">Im</text>
-          <text x="400" y="48" fontSize="12" fill="#737373">z 平面</text>
-          <text x="530" y="72" fontSize="10.5" fill="#a3a3a3" fontFamily="monospace">|z| = 1</text>
+          <rect x="390" y="30" width="230" height="200" fill="none" stroke="var(--color-border)" />
+          <circle cx="505" cy="130" r="75" fill="var(--color-primary-dark)" opacity="0.55" />
+          <circle cx="505" cy="130" r="75" fill="none" stroke="var(--color-text-muted)" strokeWidth="1.2" />
+          <line x1="390" y1="130" x2="620" y2="130" stroke="var(--color-border)" strokeWidth="1" />
+          <line x1="505" y1="30" x2="505" y2="230" stroke="var(--color-border)" strokeWidth="1" />
+          <text x="612" y="146" fontSize="12" fill="var(--color-text-secondary)" fontFamily="Georgia,serif" fontStyle="italic">Re</text>
+          <text x="511" y="44" fontSize="12" fill="var(--color-text-secondary)" fontFamily="Georgia,serif" fontStyle="italic">Im</text>
+          <text x="400" y="48" fontSize="12" fill="var(--color-text-muted)">z 平面</text>
+          <text x="530" y="72" fontSize="10.5" fill="var(--color-text-secondary)" fontFamily="monospace">|z| = 1</text>
 
-          <circle cx="462" cy="88" r="5" fill="#14b8a6" />
-          <circle cx="472" cy="172" r="5" fill="#14b8a6" />
-          <circle cx="590" cy="98" r="5" fill="#ef4444" />
-          <text x="470" y="82" fontSize="10.5" fill="#14b8a6" fontFamily="monospace">z₁</text>
-          <text x="480" y="186" fontSize="10.5" fill="#14b8a6" fontFamily="monospace">z₁*</text>
-          <text x="598" y="92" fontSize="10.5" fill="#ef4444" fontFamily="monospace">z₂</text>
+          <circle cx="462" cy="88" r="5" fill="var(--color-primary-light)" />
+          <circle cx="472" cy="172" r="5" fill="var(--color-primary-light)" />
+          <circle cx="590" cy="98" r="5" fill="var(--color-danger)" />
+          <text x="470" y="82" fontSize="10.5" fill="var(--color-primary-light)" fontFamily="monospace">z₁</text>
+          <text x="480" y="186" fontSize="10.5" fill="var(--color-primary-light)" fontFamily="monospace">z₁*</text>
+          <text x="598" y="92" fontSize="10.5" fill="var(--color-danger)" fontFamily="monospace">z₂</text>
         </svg>
       </div>
       <figcaption className="text-sm text-text-muted mt-3 leading-relaxed">

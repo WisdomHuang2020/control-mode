@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight, BookOpen, Calculator, Search, ShieldCheck, GitBranch } from 'lucide-react'
 
 const fadeUp = {
@@ -30,6 +30,10 @@ const principles = [
 ]
 
 export default function Home() {
+  // 尊重系统「减少动态效果」：开启时跳过入场动画，直接呈现最终状态
+  const reduceMotion = useReducedMotion()
+  const initialState = reduceMotion ? false : 'hidden'
+
   return (
     <div>
       {/* Hero：背景网格与站群其它 React 站同源（LLC Home 的 HeroCircuitBackground） */}
@@ -45,7 +49,7 @@ export default function Home() {
           </svg>
         </div>
         <div className="relative max-w-7xl mx-auto px-4 py-20 md:py-28">
-          <motion.div custom={0} initial="hidden" animate="visible" variants={fadeUp}>
+          <motion.div custom={0} initial={initialState} animate="visible" variants={fadeUp}>
             <div className="font-mono text-xs tracking-[0.2em] text-primary-light uppercase mb-5">
               Power Electronics · Modeling &amp; Control
             </div>
@@ -72,7 +76,7 @@ export default function Home() {
         <div className="section-h"><h2>两个入口</h2><div className="line" /></div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {entries.map((e, i) => (
-            <motion.div key={e.to} custom={i} initial="hidden" animate="visible" variants={fadeUp}>
+            <motion.div key={e.to} custom={i} initial={initialState} animate="visible" variants={fadeUp}>
               <Link to={e.to} className="card-surface feature-card h-full block hover:no-underline">
                 <div className="k">{e.k}</div>
                 <h3 className="flex items-center gap-2"><e.icon className="w-4 h-4 text-primary-light" />{e.title}</h3>
@@ -81,7 +85,7 @@ export default function Home() {
               </Link>
             </motion.div>
           ))}
-          <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp}>
+          <motion.div custom={2} initial={initialState} animate="visible" variants={fadeUp}>
             <div className="card-surface feature-card dim h-full">
               <div className="k">SEARCH · 02</div>
               <h3 className="flex items-center gap-2"><Search className="w-4 h-4" />全库检索</h3>
