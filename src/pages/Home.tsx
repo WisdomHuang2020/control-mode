@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'framer-motion'
-import { ArrowRight, BookOpen, Calculator, Search, ShieldCheck, GitBranch } from 'lucide-react'
+import { ArrowRight, BookOpen, Calculator, Search, ShieldCheck, GitBranch, Library } from 'lucide-react'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -11,6 +11,11 @@ const fadeUp = {
 }
 
 const entries = [
+  {
+    to: '/handbook', k: 'HANDBOOK · 01', icon: Library, title: '建模与控制手册',
+    desc: '12 阶，从「开关电源在控什么」一路走到 MPC。每章一句话直觉 + 核心公式 + 对照表 + 常见误区 + 两道自测，末尾标出知识库出处。嫌长篇太厚，从这本开始。',
+    status: '已上线 · 12 阶',
+  },
   {
     to: '/learn/s-to-z', k: 'TRAINING · 01', icon: BookOpen, title: '从 S 变换到 Z 变换',
     desc: '采样为什么把拉普拉斯变成 z 变换、s 平面如何折叠进单位圆、四种离散化方法各自的来路与代价。全部结论附《自动控制原理（卢京潮）》《自动控制原理与设计》《Fundamentals of Power Electronics》原文坐标。',
@@ -73,8 +78,8 @@ export default function Home() {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 pb-8">
-        <div className="section-h"><h2>两个入口</h2><div className="line" /></div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="section-h"><h2>三个入口</h2><div className="line" /></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {entries.map((e, i) => (
             <motion.div key={e.to} custom={i} initial={initialState} animate="visible" variants={fadeUp}>
               <Link to={e.to} className="card-surface feature-card h-full block hover:no-underline">
@@ -108,12 +113,8 @@ export default function Home() {
 
         <div className="section-h" id="scope"><h2>本轮预览的范围</h2><div className="line" /></div>
         <div className="card-surface p-6">
-          <p className="text-text-secondary leading-relaxed"><strong className="text-text-primary">这是最小切片，不是成品站。</strong>用来验证三件事：</p>
-          <ol className="list-decimal pl-6 mt-3 space-y-1.5 text-text-secondary leading-relaxed">
-            <li>书籍里的结论能不能逐条追到原文坐标，而不是写成「一般认为」；</li>
-            <li>高密度公式在工程风深色版式 + 本地 KaTeX 下是否可读；</li>
-            <li>「输入 D(s) → 实时出 D(z) + 频响」的交互是否真有工程价值。</li>
-          </ol>
+          <p className="text-text-secondary leading-relaxed"><strong className="text-text-primary">已经做的：</strong>手册 12 阶（建模与控制的完整主线）、S→Z 长篇专题 1 篇（逐条公式溯源）、Tustin 计算器 1 个（内核可单独复核）。</p>
+          <p className="text-text-secondary leading-relaxed mt-3"><strong className="text-text-primary">还没做的，如实写在这里：</strong>知识库 20,596 条公式只用到约 90 条，7,522 张书内插图一张未用，43 本书只覆盖到 4 个领域的骨架；跨书检索（17,292 块）尚未开放成可交互页面。这些不是「即将上线」，是没有排期。</p>
           <div className="mt-5 pt-5 border-t border-border text-sm text-text-muted leading-relaxed">
             技术栈与站群一致：Vite + React + TypeScript + Tailwind CSS；公式由 KaTeX 本地打包，无 CDN 依赖；
             计算内核为独立模块，页面与内核可分别复核。
@@ -122,7 +123,7 @@ export default function Home() {
 
         <div className="mt-10 flex items-center gap-2 text-sm text-text-muted">
           <ArrowRight className="w-4 h-4" />
-          <Link to="/learn/s-to-z" className="text-primary-light hover:underline">从 S 变换到 Z 变换开始读</Link>
+          <Link to="/handbook" className="text-primary-light hover:underline">从手册第 1 阶开始读</Link>
         </div>
       </div>
     </div>

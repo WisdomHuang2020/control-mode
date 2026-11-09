@@ -1,6 +1,8 @@
 import { BrowserRouter, HashRouter, Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import Home from './pages/Home'
+import Handbook from './pages/Handbook'
+import Chapter from './pages/Chapter'
 import SToZ from './pages/SToZ'
 import Tustin from './pages/Tustin'
 
@@ -22,6 +24,8 @@ export default function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/handbook" element={<Handbook />} />
+          <Route path="/handbook/:slug" element={<Chapter />} />
           <Route path="/learn/s-to-z" element={<SToZ />} />
           <Route path="/tools/tustin" element={<Tustin />} />
           {/* 未知路径回首页：SPA 由 nginx 回退，这里给出确定行为，不显示空白页。 */}

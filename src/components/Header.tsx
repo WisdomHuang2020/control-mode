@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, House, BookOpen, Calculator, Layers } from 'lucide-react'
+import { Menu, X, House, BookOpen, Calculator, Layers, Library } from 'lucide-react'
 import BrandMark from './BrandMark'
 import VersionBadge from './VersionBadge'
 import ThemeSwitcher from './ThemeSwitcher'
 
 const navLinks = [
   { path: '/', label: '首页', icon: Layers },
+  { path: '/handbook', label: '手册', icon: Library },
   { path: '/learn/s-to-z', label: '培训', icon: BookOpen },
   { path: '/tools/tustin', label: '工具', icon: Calculator },
 ]
@@ -25,7 +26,10 @@ export default function Header() {
 
         <nav className="hidden md:flex items-center gap-1">
           {navLinks.map((link) => {
-            const isActive = location.pathname === link.path
+            // 手册是嵌套路由（/handbook/:slug），子页也要让父项保持高亮
+            const isActive =
+              location.pathname === link.path ||
+              (link.path !== '/' && location.pathname.startsWith(link.path + '/'))
             const Icon = link.icon
             return (
               <Link
