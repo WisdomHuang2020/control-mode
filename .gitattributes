@@ -1,0 +1,8 @@
+# 本机 core.autocrlf=true：不约束时 Windows 工作区会把这些文件写成 CRLF，
+# 后果是 bash 报 `$'\r': command not found`、nginx/CI 配置里混入隐藏回车。
+# 仓库内一律以 LF 存储；下面几类在工作区也强制 LF。
+* text=auto
+*.sh   text eol=lf
+*.yml  text eol=lf
+*.conf text eol=lf
+*.mjs  text eol=lf
