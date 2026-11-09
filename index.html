@@ -8,6 +8,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>开关变换器 · 建模与控制 — 知识工程站</title>
     <meta name="description" content="从书籍到可计算工具的开关变换器建模与控制知识工程站：公式可溯源、工具可复核。" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <!-- 站群 8 色主题首屏防闪：必须在 body 渲染前执行。
+         IDS 与 BG 必须与 src/theme.ts 的 THEMES / THEME_BG 逐项一致。 -->
+    <script>
+      (function () {
+        var IDS = ['dark-teal', 'blue', 'navy-tech', 'graphite', 'warm-paper', 'forest', 'indigo', 'sea-salt']
+        var BG = {
+          'dark-teal': '#0a0a0a', blue: '#f6f7f9', 'navy-tech': '#0b1a2b', graphite: '#f2f3f5',
+          'warm-paper': '#faf6ed', forest: '#0c1712', indigo: '#f6f5fc', 'sea-salt': '#eef7f7'
+        }
+        try {
+          var q = new URLSearchParams(location.search).get('theme')
+          var v = IDS.indexOf(q) >= 0 ? q : localStorage.getItem('pk-theme')
+          if (IDS.indexOf(v) >= 0) {
+            document.documentElement.dataset.theme = v
+            var m = document.querySelector('meta[name="theme-color"]')
+            if (m && BG[v]) m.setAttribute('content', BG[v])
+          }
+        } catch (e) {}
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

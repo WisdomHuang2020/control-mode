@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { Menu, X, House, BookOpen, Calculator, Layers } from 'lucide-react'
 import BrandMark from './BrandMark'
 import VersionBadge from './VersionBadge'
+import ThemeSwitcher from './ThemeSwitcher'
 
 const navLinks = [
   { path: '/', label: '首页', icon: Layers },
@@ -51,6 +52,7 @@ export default function Header() {
           >
             <House className="w-4 h-4" /> 站群入口
           </a>
+          <ThemeSwitcher />
         </div>
 
         <button
@@ -77,7 +79,10 @@ export default function Header() {
               </Link>
             )
           })}
-          <div className="flex items-center gap-3 px-3 py-2"><VersionBadge /></div>
+          <div className="flex items-center justify-between gap-3 px-3 py-2">
+            <VersionBadge />
+            <ThemeSwitcher />
+          </div>
         </div>
       )}
     </header>

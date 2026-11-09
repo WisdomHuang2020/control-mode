@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { THEME_EVENT, readThemeColors } from '../theme'
 
 export interface BodeSeries {
   y: number[]
@@ -19,9 +20,9 @@ interface BodeChartProps {
 }
 
 /**
- * 幅相频响图。由原站 js/tustin.js 的 plot() 迁移，配色改为站群深色主题：
- *   网格 #404040 / 文字 #a3a3a3 / 边框 #525252 /
- *   fs/2 标记 #f59e0b（amber）/ fw 标记 #14b8a6（teal）。
+ * 幅相频响图。由原站 js/tustin.js 的 plot() 迁移。
+ * 配色取自当前主题变量（`readThemeColors()`），切换 8 套主题后自动重绘；
+ * 曲线颜色由调用方传入，Tustin 页同样按主题变量派生。
  * 计算数据全部由纯函数模块 tustin-core 生成，本组件只负责绘制，不含任何数值逻辑。
  */
 export default function BodeChart({
@@ -33,6 +34,7 @@ export default function BodeChart({
     const draw = () => {
       const cv = canvasRef.current
       if (!cv) return
+      const C = readThemeColors()
       const dpr = window.devicePixelRatio || 1
       const W = cv.clientWidth || 800
       const H = height
@@ -51,7 +53,7 @@ export default function BodeChart({
       const X = (f: number) => padL + (Math.log10(f) - lf0) / (lf1 - lf0) * iw
       const Y = (v: number) => padT + ih - (v - ymin) / (ymax - ymin) * ih
 
-      ctx.strokeStyle = '#404040'
+      ctx.strokeStyle = C.grid
       ctx.lineWidth = 1
       ctx.font = '11px ui-monospace, Consolas, monospace'
 
@@ -59,7 +61,7 @@ export default function BodeChart({
         const y = Y(v)
         ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(padL + iw, y); ctx.stroke()
         ctx.textAlign = 'right'; ctx.textBaseline = 'middle'
-        ctx.fillStyle = '#a3a3a3'
+        ctx.fillStyle = C.muted
         ctx.fillText(String(v), padL - 8, y)
       }
       for (let d = Math.ceil(lf0); d <= Math.floor(lf1); d++) {
@@ -68,32 +70,32 @@ export default function BodeChart({
         ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT + ih); ctx.stroke()
         ctx.textAlign = 'center'; ctx.textBaseline = 'top'
         const lbl = fx >= 1e6 ? `${fx / 1e6}M` : fx >= 1e3 ? `${fx / 1e3}k` : String(fx)
-        ctx.fillStyle = '#a3a3a3'
+        ctx.fillStyle = C.muted
         ctx.fillText(lbl, x, padT + ih + 6)
       }
 
       // 奈奎斯特频率
       const xny = X(fmax)
-      ctx.strokeStyle = '#f59e0b'
+      ctx.strokeStyle = C.accent
       ctx.setLineDash([4, 4])
       ctx.beginPath(); ctx.moveTo(xny, padT); ctx.lineTo(xny, padT + ih); ctx.stroke()
       ctx.setLineDash([])
       ctx.textAlign = 'right'; ctx.textBaseline = 'top'
-      ctx.fillStyle = '#fbbf24'
+      ctx.fillStyle = C.accentLight
       ctx.fillText('fs/2', padL + iw, padT + 2)
 
       // 预畸变校核点
       if (marker && marker > fmin && marker < fmax) {
         const xm = X(marker)
-        ctx.strokeStyle = '#14b8a6'
+        ctx.strokeStyle = C.primaryLight
         ctx.setLineDash([3, 3]); ctx.lineWidth = 1.4
         ctx.beginPath(); ctx.moveTo(xm, padT); ctx.lineTo(xm, padT + ih); ctx.stroke()
         ctx.setLineDash([])
-        ctx.textAlign = 'center'; ctx.fillStyle = '#14b8a6'
+        ctx.textAlign = 'center'; ctx.fillStyle = C.primaryLight
         ctx.fillText('fw', xm, padT + 2)
       }
 
-      ctx.fillStyle = '#a3a3a3'
+      ctx.fillStyle = C.muted
       ctx.textAlign = 'left'; ctx.textBaseline = 'top'
       ctx.font = "11.5px Inter, system-ui, 'Segoe UI', sans-serif"
       ctx.fillText(ylabel, padL - 52, 0)
@@ -112,13 +114,18 @@ export default function BodeChart({
       }
       ctx.restore()
 
-      ctx.strokeStyle = '#525252'; ctx.lineWidth = 1
+      ctx.strokeStyle = C.frame; ctx.lineWidth = 1
       ctx.strokeRect(padL, padT, iw, ih)
     }
 
     draw()
     window.addEventListener('resize', draw)
-    return () => window.removeEventListener('resize', draw)
+    // 切换 8 套主题后按新变量重绘（canvas 不会自动跟随 CSS 变量）
+    window.addEventListener(THEME_EVENT, draw)
+    return () => {
+      window.removeEventListener('resize', draw)
+      window.removeEventListener(THEME_EVENT, draw)
+    }
   }, [fmin, fmax, series, ymin, ymax, ticks, ylabel, marker, height])
 
   return <canvas ref={canvasRef} className="w-full block" aria-label="幅相频响对比图" role="img" />

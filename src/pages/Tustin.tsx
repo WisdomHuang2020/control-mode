@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import MathBlock from '../components/MathBlock'
 import InlineMath from '../components/InlineMath'
 import Callout from '../components/Callout'
 import BodeChart from '../components/BodeChart'
+import { THEME_EVENT, readThemeColors } from '../theme'
 import {
   computeTustin, frequencyResponse, errorAt, differenceEquation,
   parseSeries, presetCoefficients, fmt, texPoly, texNeg, PRESETS,
@@ -11,8 +12,6 @@ import {
 
 const M = InlineMath
 const PRESET_KEYS = ['lead', 'pi', 'pd', 'pid']
-const NUM_COLOR = '#9aa0a6'   // 连续基准
-const DEN_COLOR = '#14b8a6'   // 离散 Tustin
 
 function nz(x: number) {
   return Math.abs(x) < 1e-6 ? '0' : fmt(x, 3)
@@ -30,6 +29,14 @@ export default function Tustin() {
   const [fpKhz, setFpKhz] = useState('200')
   const [delayStr, setDelayStr] = useState('0')
   const [preset, setPreset] = useState('lead')
+
+  // 曲线颜色跟随当前主题（canvas 与图例色点共用同一份）
+  const [C, setC] = useState(readThemeColors)
+  useEffect(() => {
+    const sync = () => setC(readThemeColors())
+    window.addEventListener(THEME_EVENT, sync)
+    return () => window.removeEventListener(THEME_EVENT, sync)
+  }, [])
 
   const model = useMemo(() => {
     const num = parseSeries(numStr)
@@ -61,13 +68,13 @@ export default function Tustin() {
   }, [numStr, denStr, tsUs, fpKhz, delayStr])
 
   const magSeries = useMemo(() => model.valid ? [
-    { y: model.fr.mag, color: NUM_COLOR, width: 2 },
-    { y: model.fr.magD, color: DEN_COLOR, width: 2.2 },
-  ] : [], [model])
+    { y: model.fr.mag, color: C.muted, width: 2 },
+    { y: model.fr.magD, color: C.primaryLight, width: 2.2 },
+  ] : [], [model, C])
   const phaSeries = useMemo(() => model.valid ? [
-    { y: model.fr.pha, color: NUM_COLOR, width: 2 },
-    { y: model.fr.phaD, color: DEN_COLOR, width: 2.2 },
-  ] : [], [model])
+    { y: model.fr.pha, color: C.muted, width: 2 },
+    { y: model.fr.phaD, color: C.primaryLight, width: 2.2 },
+  ] : [], [model, C])
 
   function applyPreset(key: string) {
     setPreset(key)
@@ -163,8 +170,8 @@ export default function Tustin() {
               marker={model.params.fp > 0 ? model.params.fp : null} height={230}
             />
             <div className="legend">
-              <span><i style={{ borderColor: NUM_COLOR }} />连续 Gc(s)（基准）</span>
-              <span><i style={{ borderColor: DEN_COLOR }} />离散 Gcd(z)（Tustin）</span>
+              <span><i style={{ borderColor: C.muted }} />连续 Gc(s)（基准）</span>
+              <span><i style={{ borderColor: C.primaryLight }} />离散 Gcd(z)（Tustin）</span>
               <span className="text-accent-light">虚线 = 奈奎斯特频率 fs/2</span>
               <span className="text-primary-light">绿虚线 = 预畸变校核点 fw</span>
             </div>
@@ -176,8 +183,8 @@ export default function Tustin() {
               marker={model.params.fp > 0 ? model.params.fp : null} height={200}
             />
             <div className="legend">
-              <span><i style={{ borderColor: NUM_COLOR }} />∠Gc</span>
-              <span><i style={{ borderColor: DEN_COLOR }} />∠Gcd</span>
+              <span><i style={{ borderColor: C.muted }} />∠Gc</span>
+              <span><i style={{ borderColor: C.primaryLight }} />∠Gcd</span>
             </div>
           </div>
 
