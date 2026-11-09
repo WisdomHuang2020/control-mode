@@ -13,7 +13,7 @@ function Dots({ n }: { n: number }) {
   )
 }
 
-/** 读法：不同目的走不同路径，避免「从第 1 阶老老实实读到第 19 阶」这种劝退式入口。 */
+/** 读法：不同目的走不同路径，避免「从第 1 阶老老实实读到第 18 阶」这种劝退式入口。 */
 const PATHS: { name: string; desc: string; slugs: string[] }[] = [
   {
     name: '最短可用路径',
@@ -21,28 +21,25 @@ const PATHS: { name: string; desc: string; slugs: string[] }[] = [
     slugs: ['feedback-loop', 'topologies', 'transfer-functions', 'loop-compensation'],
   },
   {
-    name: '工程完整路径',
-    desc: '要做一台新电源：拓扑 → 边界 → 建模 → 补偿 → 仿真验证 → 电感 → 保护，一条走完。',
+    name: '闭环设计路径',
+    desc: '要完整设计一个环路：拓扑 → 边界 → 建模 → 补偿 → 仿真 → 灵敏度与闭环性能。',
     slugs: [
       'feedback-loop',
       'topologies',
       'ccm-dcm',
       'small-signal',
+      'state-space-averaging',
+      'averaged-switch-model',
       'transfer-functions',
       'loop-compensation',
       'simulation',
-      'magnetics',
-      'protection',
+      'sensitivity',
+      'closed-loop-performance',
     ],
   },
   {
-    name: '量产整改路径',
-    desc: '板子已经做出来了，但纹波超标、环路振荡、谐波过不了。按这个顺序查：测量 → 输入滤波 → 保护 → PFC → 多相。',
-    slugs: ['measurement', 'input-filter', 'protection', 'pfc', 'multiphase'],
-  },
-  {
     name: '追根究底路径',
-    desc: '要把模型推一遍、看懂每个零极点的来路：全 19 阶，含电流模式、数字控制与谐振。',
+    desc: '要把模型推一遍、看懂每个零极点的来路：全 18 阶，含电流模式、数字控制与现代控制。',
     slugs: CHAPTERS.map((c) => c.slug),
   },
 ]
@@ -57,7 +54,8 @@ export default function Handbook() {
         <h1 className="text-3xl md:text-4xl font-bold tracking-tight">建模与控制手册</h1>
         <p className="mt-3 text-text-secondary leading-relaxed">
           前 12 阶是一条主线：从「开关电源在控什么」一路推到 MPC，一阶比一阶难一点。
-          后 7 阶换了一条轴，讲「从会算到做得出来」——电感、输入滤波器、应力与保护、测量、谐振、PFC、多相。
+          后 6 阶是专题：根轨迹、灵敏度、闭环性能、模型边界、饱和、前馈——
+          都是前面一笔带过、工程上却一定会撞到的地方。
           每章都给一句话直觉、核心公式、常见误区和两道自测，末尾标出它在知识库里的出处。
         </p>
         <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-text-muted">
@@ -74,10 +72,10 @@ export default function Handbook() {
       </header>
 
       <div className="section-h">
-        <h2>四条读法</h2>
+        <h2>三条读法</h2>
         <div className="line" />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {PATHS.map((p) => (
           <div key={p.name} className="card-surface feature-card">
             <div className="k">
@@ -136,7 +134,7 @@ export default function Handbook() {
                     </h3>
                     <p className="mt-1 text-sm leading-relaxed text-text-secondary"><RichText text={c.tagline} /></p>
                     <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-text-muted">
-                      <span>{c.difficultyText ?? DIFFICULTY_LABEL[c.difficulty]}</span>
+                      <span>{DIFFICULTY_LABEL[c.difficulty]}</span>
                       <span className="inline-flex items-center gap-1">
                         <Clock className="w-3 h-3" /> {c.minutes} 分钟
                       </span>
@@ -169,9 +167,9 @@ export default function Handbook() {
           换一版书就全错了。本页不写「一般认为」，写不出出处的结论就不写。
         </p>
         <p>
-          <strong>第五阶段只写知识库里真有出处的方向。</strong>磁性元件与输入滤波器取 Erickson 的磁学与滤波器章节，
-          谐振取库里的 LLC / DAB / CLLC 专门资料，PFC 取 PFC 导论与交错并联 Boost PFC 论文。
-          EMI 整改与热设计库里没有专书，所以<strong>这一版缺这两章</strong>——宁可缺，不编。
+          <strong>范围只到建模与控制。</strong>磁性元件设计、EMI 与布局、热设计、可靠性工程不在本手册里——
+          它们很重要，但不是这套书的主线，写成半章只会误导。同理，讲拓扑也只讲到「能推出传递函数」为止。
+          想看这些方向，得另找文献，别指望这本手册给半吊子的答案。
         </p>
       </div>
     </div>

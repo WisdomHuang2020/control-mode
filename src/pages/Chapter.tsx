@@ -7,10 +7,9 @@ import { DIFFICULTY_LABEL, chapterBySlug, chapterNeighbors, CHAPTERS } from '../
 import type { Block } from '../data/handbook'
 
 /** 难度用五个点表示，比写「难度 4/5」更快看懂。 */
-function DifficultyDots({ n, text }: { n: number; text?: string }) {
-  const label = text ?? DIFFICULTY_LABEL[n]
+function DifficultyDots({ n }: { n: number }) {
   return (
-    <span className="inline-flex items-center gap-[3px]" aria-label={`难度 ${n}/5：${label}`}>
+    <span className="inline-flex items-center gap-[3px]" aria-label={`难度 ${n}/5：${DIFFICULTY_LABEL[n]}`}>
       {[1, 2, 3, 4, 5].map((i) => (
         <span
           key={i}
@@ -167,7 +166,7 @@ export default function Chapter() {
             </Link>
             <span className="font-mono tracking-[0.1em]">第 {ch.level} 阶 · {ch.band}</span>
             <span className="inline-flex items-center gap-1.5">
-              难度 <DifficultyDots n={ch.difficulty} text={ch.difficultyText} />
+              难度 <DifficultyDots n={ch.difficulty} />
             </span>
             <span className="inline-flex items-center gap-1">
               <Clock className="w-3.5 h-3.5" /> 约 {ch.minutes} 分钟
