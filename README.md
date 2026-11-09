@@ -21,7 +21,7 @@ react-router-dom 7 + lucide-react + framer-motion + KaTeX（本地打包，无 C
 | `src/components/VersionBadge.tsx` | 版本号唯一显示点（页头 + 页脚） |
 | `scripts/` | 计算内核复核、版本断言、四方一致性审计 |
 | `.github/workflows/` | Pages 兜底 / Lighthouse 正式 / tag→Release |
-| `deploy/` | nginx vhost 留档模板 + 手动首部署脚本 |
+| `deploy/` | nginx vhost 模板、手动部署脚本、服务器拉取式自动部署脚本 |
 
 ## 本地开发与门禁
 
@@ -47,11 +47,6 @@ npm run audit      # 发版收尾：CHANGELOG ↔ package.json ↔ 远端 tag �
 
 ## 部署
 
-正式通道 `.github/workflows/deploy-lighthouse.yml`，需仓库 secrets：
-`LH_HOST` / `LH_USER` / `LH_ROOT` / `LH_SSH_KEY` / `LH_PORT`（可选）。
-**未配置时工作流优雅跳过但 job 仍显示绿勾（假绿）** —— 判断是否真的部署了，必须下钻到步骤级
-看 `Deploy to server over SSH` 是 `success` 而不是 `skipped`。
-
 | 要素 | 值 |
 |---|---|
 | 目标机 | `43.142.148.37`（root，端口 22） |
@@ -60,8 +55,43 @@ npm run audit      # 发版收尾：CHANGELOG ↔ package.json ↔ 远端 tag �
 | 301 归一 | `control-mode.power-knowledge.tech` → 主服务域名 |
 | 证书 | 独立双名证书 `control-mode.power-knowledge.tech`（webroot HTTP-01） |
 | 版本哨兵 | `/var/www/control-mode/.deployed-version`（三段式、不带 `v`） |
+| commit 哨兵 | `/var/www/control-mode/.deployed-commit`（已部署的 commit SHA） |
 
-首次部署、CI secrets 尚未填时可用 `deploy/deploy.sh` 手动上传（用法见脚本头部注释）。
+### 当前生效通道：服务器拉取式自动部署（不需要 secrets）
+
+`deploy/server-pull-deploy.sh` 安装为服务器上的 `/usr/local/bin/control-mode-deploy.sh`，
+由 `/etc/cron.d/control-mode-deploy` 每 5 分钟触发一次：
+
+1. `git ls-remote` 取 GitHub `main` 的 SHA，与线上 `.deployed-commit` 比对；
+2. 一致且版本哨兵存在 → 静默退出（不写日志，避免每 5 分钟刷屏）；
+3. 有变化 → `git reset --hard` → 依赖按 lock 哈希判断（未变则跳过 `npm ci`）→ `npm run build`；
+4. **构建成功才发布**：`rsync --delete` 到 `/var/www/control-mode`，再写两个哨兵。
+
+所以 `git push` 之后几分钟内自动上线，全程不需要 PAT、不需要 GitHub Actions secrets
+（仓库是公开的，服务器走 HTTPS 匿名只读）。
+
+| 项 | 路径 |
+|---|---|
+| 源码工作副本 | `/opt/control-mode-src` |
+| 部署脚本 | `/usr/local/bin/control-mode-deploy.sh` |
+| 定时任务 | `/etc/cron.d/control-mode-deploy` |
+| 日志 / 轮转 | `/var/log/control-mode-deploy.log`、`/etc/logrotate.d/control-mode-deploy` |
+
+手动执行：`/usr/local/bin/control-mode-deploy.sh`；停用：把 `/etc/cron.d/control-mode-deploy`
+移出（脚本内 `flock` 保证与手动执行不会并发）。
+
+> 它只写 `/opt/control-mode-src` 与 `/var/www/control-mode`，不碰 nginx 和其它站。
+> 构建失败会直接退出，线上保持上一版，不会出现半成品。
+
+### 备用通道：GitHub Actions（当前为假绿）
+
+`.github/workflows/deploy-lighthouse.yml` 需要仓库 secrets：
+`LH_HOST` / `LH_USER` / `LH_ROOT` / `LH_SSH_KEY` / `LH_PORT`（可选）。
+**未配置时工作流优雅跳过但 job 仍显示绿勾（假绿）** —— 判断是否真的部署了，必须下钻到步骤级
+看 `Deploy to server over SSH` 是 `success` 而不是 `skipped`。
+
+应急手动上传或回滚可用 `deploy/deploy.sh`（用法见脚本头部注释）。
+
 nginx vhost 模板见 `deploy/nginx-control-mode.conf`，线上生效文件为
 `/etc/nginx/sites-available/control-mode`，两侧改动必须同步并跑 `nginx -t`。
 
