@@ -81,8 +81,8 @@ export const PART1: Chapter[] = [
       },
     ],
     sources: [
-      { book: '开关变换器的建模与控制（张卫平）', where: '§1.1 直流-直流变换器控制系统概述', chunk: 1527 },
-      { book: '开关变换器的建模与控制（张卫平）', where: '§1.2 小信号模型概述', chunk: 1528 },
+      { book: '开关变换器的建模与控制（张卫平）', where: '§1.1 直流-直流变换器控制系统概述' },
+      { book: '开关变换器的建模与控制（张卫平）', where: '§1.2 小信号模型概述' },
     ],
   },
 
@@ -171,7 +171,7 @@ export const PART1: Chapter[] = [
     ],
     sources: [
       { book: 'Fundamentals of Power Electronics (Erickson & Maksimović, 3rd Ed)', where: 'Ch.2 Principles of Steady-State Converter Analysis' },
-      { book: '开关变换器的建模与控制（张卫平）', where: '§1.1（伏秒平衡与稳态分析）', chunk: 1587 },
+      { book: '开关变换器的建模与控制（张卫平）', where: '§1.1（伏秒平衡与稳态分析）' },
     ],
   },
 
@@ -257,7 +257,7 @@ export const PART1: Chapter[] = [
     ],
     sources: [
       { book: 'Fundamentals of Power Electronics (Erickson & Maksimović, 3rd Ed)', where: 'Ch.5 The Discontinuous Conduction Mode' },
-      { book: '开关变换器的建模与控制（张卫平）', where: '第 2 章 DCM 下变换器建模（§2.1–2.3）', chunk: 1526 },
+      { book: '开关变换器的建模与控制（张卫平）', where: '第 2 章 DCM 下变换器建模（§2.1–2.3）' },
     ],
   },
 ]

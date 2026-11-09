@@ -117,8 +117,8 @@ export const PART5: Chapter[] = [
     ],
     sources: [
       { book: '自动控制原理（卢京潮）', where: '根轨迹法：相角条件、幅值条件与绘制规则' },
-      { book: '自动控制原理与设计（第6版）', where: '超前校正与滞后校正的频率法设计' },
-      { book: '控制之美（卷1）——控制理论从传递函数到状态空间（王天威）', where: '闭环极点位置与动态性能' },
+      { book: '自动控制原理与设计（第6版）第1-300页', where: '第 6 章 频率响应设计法：超前补偿与滞后补偿' },
+      { book: '控制之美（卷1）控制理论从传递函数到状态空间（王天威）', where: '闭环极点位置与动态性能' },
     ],
   },
 
@@ -133,7 +133,7 @@ export const PART5: Chapter[] = [
     prereq: ['loop-compensation'],
     goal: [
       '写出 $S$ 与 $T_{cl}$，说明 $S+T_{cl}=1$ 为什么是所有折中的源头',
-      '用 Bode 灵敏度积分解释「带宽不是免费的」',
+      '用模值裕度与伯德的设计限制解释「带宽不是免费的」',
       '把给定的相位裕度换算成最坏情况下的扰动放大倍数',
     ],
     blocks: [
@@ -172,23 +172,28 @@ export const PART5: Chapter[] = [
         t: 'p',
         x: '这条经验式把两个世界连起来了：给定裕度能算出最坏放大倍数，反过来给定允许的超调也能倒推需要的裕度。代入 $PM=45^\\circ$ 得 $|S|_{max}=1/(2\\sin22.5^\\circ)\\approx1.31$，与上表一致。',
       },
-      { t: 'h', x: 'Bode 灵敏度积分：带宽为什么不是免费的' },
+      { t: 'h', x: '同一个数的另一张脸：模值裕度' },
+      {
+        t: 'p',
+        x: '把 $1+T$ 看成复平面上的向量，$|S|_{max}$ 就是 $|1+T|$ 的最小值——也就是**奈奎斯特曲线到 $-1$ 点的最短距离**。Basso 把这个距离叫模值裕度（modulus margin），工程上要求不小于 0.5：',
+      },
       {
         t: 'f',
-        latex: '\\int_0^{\\infty}\\ln\\big|S(j\\omega)\\big|\\,\\mathrm{d}\\omega=0\\qquad(\\text{开环稳定且最小相位})',
+        latex: '\\Delta M=\\min_\\omega\\big|1+T(j\\omega)\\big|=\\frac{1}{|S|_{max}}\\ \\ge\\ 0.5\\qquad\\Longleftrightarrow\\qquad |S|_{max}\\le 2\\ (\\approx6\\ \\mathrm{dB})',
       },
       {
         t: 'p',
-        x: '这条积分说明：$|S|<1$（扰动被压）的频段，必然有 $|S|>1$（扰动被放大）的频段与之抵消，且两块面积相等。工程上叫**水床效应**——按下一头，另一头一定鼓起来。',
+        x: '于是「裕度」有了几何图像：奈奎斯特轨迹只要不钻进那个半径 0.5 的圆，增益裕度与相位裕度就同时满足。反过来，轨迹一贴近 $-1$，灵敏度立刻冒尖，那个频段的扰动被放大——**这就是「相位裕度不足会超调」的真实机理**，不是经验口诀。',
+      },
+      { t: 'h', x: '带宽不是免费的：伯德早就把它证成了限制条件' },
+      {
+        t: 'p',
+        x: '《自动控制原理与设计》的讲法比「经验」硬：伯德推导出的是**约束可获得指标的限制条件**——你希望误差在尽量宽的频段里都小（低频 $|S|$ 小），又希望对象很不准时系统仍然鲁棒（高频 $|S|$ 必须回到 1），两个要求在同一张 Bode 图上互相挤占，不可能同时按理想值满足。',
       },
       {
         t: 'callout',
         kind: 'key',
-        x: '这条式子解释了两件事：① **提高带宽不是免费的**，压掉的低频灵敏度一定会以高频放大为代价；② **右半平面零点或延迟会让它更糟**——此时积分不再为零，而是一个正数，「放大区」比「压制区」更大。所以 Boost 这类带 RHP 零点的拓扑天生难调，不是补偿器没设计好。',
-      },
-      {
-        t: 'f',
-        latex: '\\text{含 RHP 零点 } z \\text{ 时：}\\ \\int_0^{\\infty}\\ln\\big|S(j\\omega)\\big|\\,\\mathrm{d}\\omega=\\pi z>0',
+        x: '所以提高带宽从来不是免费的：低频压得越狠，穿越频率附近越容易冒尖，高频又必然回到 $|S|\\approx1$。设计的实质是**决定这份「必须付出的放大」落在哪个频段**——落在负载扰动到不了的频段，就是好设计；落在噪声敏感的频段，就得回头改。',
       },
       { t: 'h', x: '参数灵敏度：元件漂移多少会出事' },
       {
@@ -212,12 +217,12 @@ export const PART5: Chapter[] = [
         t: 'p',
         x: '它和 $S+T_{cl}=1$ 是同一件事的两种说法：把后级看成一个环路，前级阻抗就是「模型不确定性」的一部分，判据要求这份不确定性小于裕度能吸收的量。所以它要求的 6–10 dB，与相位裕度 45° 是同一量纲上的要求——**一个是扰动放大倍数，一个是阻抗比，本质都是「还能吸收多少不确定」。**',
       },
-      { t: 'rule', x: '灵敏度三句话：$S+T=1$ 决定折中，积分守恒决定代价，RHP 零点让代价更大。' },
+      { t: 'rule', x: '灵敏度三句话：$S+T=1$ 决定折中，模值裕度给出几何，伯德的设计限制说明带宽换不来免费的抑制。' },
     ],
     pitfalls: [
       '把相位裕度当「安全百分比」：它其实是 $|S|_{max}$ 的另一种说法。',
-      '一味追求高带宽：水床效应会在带宽外把噪声与扰动放大回来。',
-      '忽略 RHP 零点的积分惩罚：以为降带宽就能解决，实际下限被零点位置卡住。',
+      '一味追求高带宽：低频压下去的灵敏度会在穿越频率附近冒尖，把噪声与扰动放大回来。',
+      '忽略 RHP 零点对带宽的硬限制：以为降带宽就能绕过去，实际穿越频率被零点位置卡住。',
       '只验证低频扰动抑制：最坏放大点通常出现在穿越频率附近，要专门看那一段。',
     ],
     quiz: [
@@ -227,13 +232,13 @@ export const PART5: Chapter[] = [
       },
       {
         q: '为什么 Boost 变换器的环路普遍比 Buck 难调？',
-        a: '因为它有右半平面零点 $z=(1-D)^2R/(2L)$，Bode 灵敏度积分变成 $\\pi z>0$——放大区的总面积大于压制区。想压低某个频段的灵敏度，就必须在别处放大更多，用裕度换带宽的效率比 Buck 差得多。',
+        a: '因为它有右半平面零点 $z=(1-D)^2R/(2L)$：幅值照常按 $+20\\ \\mathrm{dB/dec}$ 上扬（和左半平面零点一模一样），相位却往下掉 90°，于是穿越频率只能压在零点以下，带宽被硬卡住。带宽一低，低频灵敏度就压不下去——伯德的设计限制在这里没有腾挪空间。',
       },
     ],
     sources: [
-      { book: 'Designing Control Loops for Linear and Switching Power Supplies (Basso)', where: '灵敏度函数、鲁棒性与稳定裕度' },
-      { book: '控制之美（卷1）——控制理论从传递函数到状态空间（王天威）', where: '灵敏度、补灵敏度与性能折中' },
-      { book: '自动控制原理（卢京潮）', where: '灵敏度函数与鲁棒性分析' },
+      { book: 'Designing Control Loops (Basso)', where: '灵敏度函数 S=1/(1+T)、模值裕度与相位裕度—瞬态响应（§3.2–3.3）' },
+      { book: '自动控制原理与设计（第6版）第1-300页', where: '灵敏度函数的定义与 S+T=1（§4.1）、灵敏度函数的设计限制（§6.7.8）' },
+      { book: 'Fundamentals of Power Electronics (Erickson & Maksimović, 3rd Ed)', where: '右半平面零点对闭环带宽的限制' },
     ],
   },
 
@@ -335,9 +340,10 @@ export const PART5: Chapter[] = [
       },
     ],
     sources: [
-      { book: 'Fundamentals of Power Electronics (Erickson & Maksimović, 3rd Ed)', where: 'Ch.8 Converter Transfer Functions（闭环输出阻抗与输入到输出传递函数）' },
-      { book: '开关变换器的建模与控制（张卫平）', where: '§3.3 开关变换器传递函数分析', chunk: 1621 },
-      { book: 'Designing Control Loops for Linear and Switching Power Supplies (Basso)', where: '闭环输出阻抗与瞬态响应' },
+      { book: 'Fundamentals of Power Electronics (Erickson & Maksimović, 3rd Ed)', where: 'Ch.9 Controller Design（闭环输出阻抗与输入到输出的闭环传递函数）' },
+      { book: '开关变换器的建模与控制（张卫平）', where: '§3.3 开关变换器传递函数分析' },
+      { book: 'Designing Control Loops (Basso)', where: '输出阻抗与灵敏度函数共同决定负载阶跃的瞬态偏差（式 4.61）' },
+      { book: '开关电源Spice仿真与实际设计', where: '开环/闭环音频敏感度 As 与输入纹波抑制（随环路增益 T 变化）' },
     ],
   },
 
@@ -438,7 +444,7 @@ export const PART5: Chapter[] = [
     ],
     sources: [
       { book: 'Fundamentals of Power Electronics (Erickson & Maksimović, 3rd Ed)', where: 'Ch.7 AC Equivalent Circuit Modeling（平均与线性化的前提）' },
-      { book: '开关变换器的建模与控制（张卫平）', where: '§1.2 小信号模型概述与适用条件', chunk: 1528 },
+      { book: '开关变换器的建模与控制（张卫平）', where: '§1.2 直流-直流变换器小信号模型概述（低频假设与小纹波假设）' },
       { book: '开关电源仿真与设计基于SPICE (Basso第2版)', where: '平均模型与开关模型的选用边界' },
     ],
   },
@@ -544,9 +550,9 @@ export const PART5: Chapter[] = [
       },
     ],
     sources: [
-      { book: 'Designing Control Loops for Linear and Switching Power Supplies (Basso)', where: '限幅、饱和与大信号行为' },
-      { book: '控制之美（卷1）——控制理论从传递函数到状态空间（王天威）', where: '饱和环节与抗积分饱和' },
-      { book: '开关变换器的建模与控制（张卫平）', where: '第 3–4 章 开关调节系统设计中的限流与饱和', chunk: 1636 },
+      { book: 'Digital Control of High-Frequency SMPS', where: '§4.4 积分饱和与 anti-windup（积分电容钳位、电流环设定值饱和引发的 windup）' },
+      { book: '自动控制原理与设计（第6版）第301-621页', where: '第 9 章 执行器饱和与积分器抗漂移（两种等效方案）' },
+      { book: '开关电源仿真与设计基于SPICE (Basso第2版)', where: '最小导通时间、死区与占空比极限对实际占空比的影响' },
     ],
   },
 
@@ -645,9 +651,9 @@ export const PART5: Chapter[] = [
       },
     ],
     sources: [
-      { book: 'Fundamentals of Power Electronics (Erickson & Maksimović, 3rd Ed)', where: 'Ch.9 Controller Design（前馈与扰动抑制）' },
-      { book: '开关变换器的建模与控制（张卫平）', where: '第 3–4 章 电压控制型系统设计与前馈', chunk: 1636 },
-      { book: '控制之美（卷1）——控制理论从传递函数到状态空间（王天威）', where: '前馈控制与复合控制结构' },
+      { book: '开关变换器环路设计指南从模拟到数字控制', where: '线电压前馈：VMC 的占空比前馈与 CMC 的固有输入抑制' },
+      { book: '自动控制原理与设计（第6版）第301-621页', where: '前馈通道与反馈-前馈复合结构、扰动抑制的分解' },
+      { book: 'Fundamentals of Power Electronics (Erickson & Maksimović, 3rd Ed)', where: 'Ch.18 Current-Programmed Control（输入电压的前馈项 Fg）' },
     ],
   },
 ]

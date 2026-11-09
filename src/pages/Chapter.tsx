@@ -244,12 +244,7 @@ export default function Chapter() {
             </div>
             <ul className="space-y-1.5 text-sm text-text-secondary">
               {ch.sources.map((s, i) => (
-                <li key={i}>
-                  《{s.book}》{s.where}
-                  {typeof s.chunk === 'number' && (
-                    <span className="ml-2 font-mono text-[11px] text-text-muted">chunk {s.chunk}</span>
-                  )}
-                </li>
+                <li key={i}>《{s.book}》{s.where}</li>
               ))}
             </ul>
             <p className="mt-3 text-xs text-text-muted leading-relaxed">

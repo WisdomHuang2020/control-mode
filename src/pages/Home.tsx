@@ -62,8 +62,8 @@ export default function Home() {
               把书里的公式，变成<span className="text-gradient">能动手算的工具</span>
             </h1>
             <p className="mt-6 text-text-secondary text-base md:text-lg leading-relaxed max-w-3xl">
-              43 本开关变换器与自动控制专著 → 17,292 个可检索文本块 → 可溯源的培训页与可复核的计算工具。
-              每一个结论后面都标着它出自哪本书、哪一页。
+              43 份资料（教材、专著、论文与厂商应用笔记混编）→ 17,292 个可检索文本块 → 可溯源的培训页与可复核的计算工具。
+              每个结论都标着它出自哪本书、哪一节；页码不写死，靠知识库检索回溯。
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Link to="/learn/s-to-z" className="inline-flex items-center gap-2 rounded-lg bg-primary hover:bg-primary-light px-5 py-2.5 text-sm font-semibold text-white transition-colors">

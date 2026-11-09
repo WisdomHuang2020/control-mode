@@ -88,7 +88,7 @@ export const PART2: Chapter[] = [
       },
     ],
     sources: [
-      { book: '开关变换器的建模与控制（张卫平）', where: '§1.2 直流-直流变换器小信号模型概述', chunk: 1528 },
+      { book: '开关变换器的建模与控制（张卫平）', where: '§1.2 直流-直流变换器小信号模型概述' },
       { book: 'Fundamentals of Power Electronics (Erickson & Maksimović, 3rd Ed)', where: 'Ch.7 AC Equivalent Circuit Modeling（§7.2 平均与线性化）' },
     ],
   },
@@ -178,7 +178,7 @@ export const PART2: Chapter[] = [
       },
     ],
     sources: [
-      { book: '开关变换器的建模与控制（张卫平）', where: '§1.3 状态空间平均法', chunk: 1526 },
+      { book: '开关变换器的建模与控制（张卫平）', where: '§1.3 状态空间平均法' },
       { book: 'Fundamentals of Power Electronics (Erickson & Maksimović, 3rd Ed)', where: 'Ch.7 §7.4 State-Space Averaging' },
     ],
   },
@@ -264,7 +264,7 @@ export const PART2: Chapter[] = [
       },
     ],
     sources: [
-      { book: '开关变换器的建模与控制（张卫平）', where: '§1.4 开关元件与开关网络平均模型法', chunk: 1526 },
+      { book: '开关变换器的建模与控制（张卫平）', where: '§1.4 开关元件与开关网络平均模型法' },
       { book: 'Fundamentals of Power Electronics (Erickson & Maksimović, 3rd Ed)', where: 'Ch.7 §7.3 开关网络的平均模型' },
     ],
   },
@@ -353,7 +353,7 @@ export const PART2: Chapter[] = [
     ],
     sources: [
       { book: 'Fundamentals of Power Electronics (Erickson & Maksimović, 3rd Ed)', where: 'Ch.8 Converter Transfer Functions' },
-      { book: '开关变换器的建模与控制（张卫平）', where: '§3.3 开关变换器传递函数分析', chunk: 1621 },
+      { book: '开关变换器的建模与控制（张卫平）', where: '§3.3 开关变换器传递函数分析' },
     ],
   },
 ]

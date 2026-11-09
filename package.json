@@ -1,7 +1,7 @@
 {
   "name": "control-mode",
   "private": true,
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "开关变换器 · 建模与控制知识工程站：公式可溯源、工具可复核",
   "type": "module",
   "scripts": {

@@ -92,7 +92,7 @@ export const PART3: Chapter[] = [
       },
     ],
     sources: [
-      { book: '开关变换器的建模与控制（张卫平）', where: '第 3–4 章 开关调节系统基础知识 / 电压控制型系统设计', chunk: 1636 },
+      { book: '开关变换器的建模与控制（张卫平）', where: '第 3–4 章 开关调节系统基础知识 / 电压控制型系统设计' },
       { book: 'Designing Control Loops (Basso)', where: 'Type I/II/III 补偿器与极点零点配置' },
     ],
   },
@@ -178,7 +178,7 @@ export const PART3: Chapter[] = [
       },
     ],
     sources: [
-      { book: '开关变换器的建模与控制（张卫平）', where: '第 5 章 平均电流控制 / 第 6 章 峰值电流控制（§6.1 次谐波振荡、§6.2 斜坡补偿）', chunk: 1526 },
+      { book: '开关变换器的建模与控制（张卫平）', where: '第 5 章 平均电流控制 / 第 6 章 峰值电流控制（§6.1 次谐波振荡、§6.2 斜坡补偿）' },
       { book: 'Fundamentals of Power Electronics (Erickson & Maksimović, 3rd Ed)', where: 'Ch.12 Current-Programmed Control' },
     ],
   },
@@ -257,7 +257,7 @@ export const PART3: Chapter[] = [
       },
     ],
     sources: [
-      { book: '开关变换器的建模与控制（张卫平）', where: '第 7 章 开关调节系统的仿真技术（PSpice）', chunk: 1724 },
+      { book: '开关变换器的建模与控制（张卫平）', where: '第 7 章 开关调节系统的仿真技术（PSpice）' },
       { book: '开关电源仿真与设计基于SPICE (Basso第2版)', where: '平均模型与开关模型的建立' },
     ],
   },

@@ -92,7 +92,7 @@ export const PART4: Chapter[] = [
       },
     ],
     sources: [
-      { book: 'Digital Control of High-Frequency Switched-Mode Power Converters', where: '采样、量化与环路延迟章节' },
+      { book: 'Digital Control of High-Frequency SMPS', where: '采样、量化与环路延迟章节' },
       { book: '自动控制原理（卢京潮）', where: 'z 变换与离散系统分析' },
     ],
   },
@@ -180,7 +180,7 @@ export const PART4: Chapter[] = [
       },
     ],
     sources: [
-      { book: '控制之美（卷2）最优化控制MPC与卡尔曼滤波器（王天威）', where: '状态空间、MPC 与卡尔曼滤波', chunk: 2533 },
+      { book: '控制之美（卷2）最优化控制MPC与卡尔曼滤波器（王天威）', where: '状态空间、MPC 与卡尔曼滤波' },
       { book: '现代控制理论基础（第2版）', where: '状态空间分析与极点配置' },
     ],
   },
