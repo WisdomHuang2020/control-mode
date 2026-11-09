@@ -57,43 +57,43 @@ npm run audit      # 发版收尾：CHANGELOG ↔ package.json ↔ 远端 tag �
 | 版本哨兵 | `/var/www/control-mode/.deployed-version`（三段式、不带 `v`） |
 | commit 哨兵 | `/var/www/control-mode/.deployed-commit`（已部署的 commit SHA） |
 
-### 当前生效通道：服务器拉取式自动部署（不需要 secrets）
+### 当前生效通道：GitHub Actions（secrets 已配置）
+
+`.github/workflows/deploy-lighthouse.yml` 在 `push` 到 `main` 或手动 `workflow_dispatch` 时运行：
+`Check configuration` → `npm ci` → `npm test` → `npm run build` → tar over ssh 发布 → 自检。
+仓库 secrets 已配置 `LH_HOST` / `LH_USER` / `LH_ROOT` / `LH_SSH_KEY` / `LH_PORT`。
+
+判断是否真的部署了，必须下钻到步骤级看 `Deploy to server over SSH` 是 `success` 而不是 `skipped`
+（secrets 缺失时 job 仍显示绿勾，即「假绿」）。
+
+应急手动上传或回滚可用 `deploy/deploy.sh`（用法见脚本头部注释）。
+
+### 备用通道：服务器拉取式（当前已停用）
 
 `deploy/server-pull-deploy.sh` 安装为服务器上的 `/usr/local/bin/control-mode-deploy.sh`，
-由 `/etc/cron.d/control-mode-deploy` 每 5 分钟触发一次：
+原本由 `/etc/cron.d/control-mode-deploy` 每 5 分钟触发，用于 GitHub Actions 尚未打通的阶段。
+Actions 已能真实部署后，cron 停用并移到 `/root/cron.d-control-mode-deploy.disabled`。
 
-1. `git ls-remote` 取 GitHub `main` 的 SHA，与线上 `.deployed-commit` 比对；
-2. 一致且版本哨兵存在 → 静默退出（不写日志，避免每 5 分钟刷屏）；
-3. 有变化 → `git reset --hard` → 依赖按 lock 哈希判断（未变则跳过 `npm ci`）→ `npm run build`；
+适用场景：Actions 额度用尽、境外 runner 异常，或需要在服务器侧独立发布时。
+
+1. `git ls-remote` 按「直连 → `ghfast.top` → `gh-proxy.com` → `ghproxy.net`」选源，取 `main` 的 SHA；
+2. 与线上 `.deployed-commit` 一致且版本哨兵存在 → 静默退出；
+3. 有变化 → `reset --hard` → 依赖按 lock 哈希判断（未变跳过 `npm ci`）→ `npm run build`；
 4. **构建成功才发布**：`rsync --delete` 到 `/var/www/control-mode`，再写两个哨兵。
-
-所以 `git push` 之后几分钟内自动上线，全程不需要 PAT、不需要 GitHub Actions secrets
-（仓库是公开的，服务器走 HTTPS 匿名只读）。
 
 | 项 | 路径 |
 |---|---|
 | 源码工作副本 | `/opt/control-mode-src` |
 | 部署脚本 | `/usr/local/bin/control-mode-deploy.sh` |
-| 定时任务 | `/etc/cron.d/control-mode-deploy` |
+| 定时任务（已停用） | `/root/cron.d-control-mode-deploy.disabled` |
 | 日志 / 轮转 | `/var/log/control-mode-deploy.log`、`/etc/logrotate.d/control-mode-deploy` |
 
-手动执行：`/usr/local/bin/control-mode-deploy.sh`；停用：把 `/etc/cron.d/control-mode-deploy`
-移出（脚本内 `flock` 保证与手动执行不会并发）。
+重新启用：`mv /root/cron.d-control-mode-deploy.disabled /etc/cron.d/control-mode-deploy`，
+并**同时停掉 Actions 的 `push` 触发**，否则两条通道会重复部署。
 
-> 它只写 `/opt/control-mode-src` 与 `/var/www/control-mode`，不碰 nginx 和其它站。
-> 构建失败会直接退出，线上保持上一版，不会出现半成品。
-
-### 备用通道：GitHub Actions（当前为假绿）
-
-`.github/workflows/deploy-lighthouse.yml` 需要仓库 secrets：
-`LH_HOST` / `LH_USER` / `LH_ROOT` / `LH_SSH_KEY` / `LH_PORT`（可选）。
-**未配置时工作流优雅跳过但 job 仍显示绿勾（假绿）** —— 判断是否真的部署了，必须下钻到步骤级
-看 `Deploy to server over SSH` 是 `success` 而不是 `skipped`。
-
-应急手动上传或回滚可用 `deploy/deploy.sh`（用法见脚本头部注释）。
-
-> 与拉取式通道**二选一**：两条同时启用会重复部署（内容相同、无数据风险，但白跑一次构建）。
-> 当前线上由拉取式通道负责，本工作流保持 skipped 即可。
+> 加多源的原因：国内服务器直连 `github.com` 的 HTTPS 会被间歇阻断（TCP 通、TLS 握手被断），
+> 实测同一分钟内可通可不通。每源 `ls-remote` 限 20s，避免直连卡死拖住 cron。
+> 脚本只写 `/opt/control-mode-src` 与 `/var/www/control-mode`，不碰 nginx 和其它站。
 
 nginx vhost 模板见 `deploy/nginx-control-mode.conf`，线上生效文件为
 `/etc/nginx/sites-available/control-mode`，两侧改动必须同步并跑 `nginx -t`。

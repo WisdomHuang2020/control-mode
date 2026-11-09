@@ -116,6 +116,10 @@ jobs:
           $SSH_CMD "printf '%s\n' '$ART_VER' > '$LH_ROOT/.deployed-version'"
           echo "已写入版本哨兵：$LH_ROOT/.deployed-version = $ART_VER"
 
+          # commit 哨兵：与服务器拉取式脚本共用同一份记录，便于审计与通道切换时避免重复部署。
+          $SSH_CMD "printf '%s\n' '$GITHUB_SHA' > '$LH_ROOT/.deployed-commit'"
+          echo "已写入 commit 哨兵：$LH_ROOT/.deployed-commit = $GITHUB_SHA"
+
       # 自检只做体检，绝不当门禁：境外 runner 到本服务器的 TLS 握手常被中间设备中断，
       # 但部署本身已成功（LLC 工作流实证）。硬门禁只在上面的 Deployment 步。
       - name: Verify live site (self-check, never blocks)
