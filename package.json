@@ -1,0 +1,31 @@
+{
+  "name": "control-mode",
+  "private": true,
+  "version": "1.0.0",
+  "description": "开关变换器 · 建模与控制知识工程站：公式可溯源、工具可复核",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "node scripts/test-tustin.mjs && node scripts/assert-version.mjs",
+    "audit": "node scripts/audit-version-sync.mjs"
+  },
+  "dependencies": {
+    "framer-motion": "^12.6.0",
+    "katex": "^0.16.21",
+    "lucide-react": "^0.487.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.5.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.1",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.0.17",
+    "typescript": "~5.7.2",
+    "vite": "^6.2.0"
+  }
+}

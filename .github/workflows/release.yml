@@ -1,0 +1,60 @@
+name: Create Release
+
+# 推 tag 不会自动创建 GitHub Release（已实测）。本工作流用 Actions 自带的
+# GITHUB_TOKEN 补齐，无需任何用户 PAT，也不需要仓库里存密钥。
+#
+# 触发：push tag v* / 手动 dispatch 补建历史 tag 的 Release。
+# 幂等：已存在同名 Release 则跳过，不把重跑变成红灯。
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: '要为其创建 Release 的 tag（留空则用当前 ref）'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve tag name
+        id: resolve
+        run: |
+          set -euo pipefail
+          TAG="${{ inputs.tag }}"
+          if [ -z "$TAG" ]; then TAG="${{ github.ref_name }}"; fi
+          git rev-parse -q --verify "refs/tags/$TAG" >/dev/null \
+            || { echo "::error::tag '$TAG' 不存在"; exit 1; }
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "解析到 tag: $TAG"
+
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.resolve.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "::notice::Release $TAG 已存在，跳过"
+            exit 0
+          fi
+          NOTES=$(git log -1 --pretty=%B "$TAG")
+          printf '%s\n' "$NOTES" > /tmp/notes.md
+          gh release create "$TAG" --title "$TAG" --notes-file /tmp/notes.md --verify-tag
+          echo "::notice::Release $TAG 创建完成"
