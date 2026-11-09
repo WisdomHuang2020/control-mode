@@ -92,6 +92,9 @@ npm run audit      # 发版收尾：CHANGELOG ↔ package.json ↔ 远端 tag �
 
 应急手动上传或回滚可用 `deploy/deploy.sh`（用法见脚本头部注释）。
 
+> 与拉取式通道**二选一**：两条同时启用会重复部署（内容相同、无数据风险，但白跑一次构建）。
+> 当前线上由拉取式通道负责，本工作流保持 skipped 即可。
+
 nginx vhost 模板见 `deploy/nginx-control-mode.conf`，线上生效文件为
 `/etc/nginx/sites-available/control-mode`，两侧改动必须同步并跑 `nginx -t`。
 
