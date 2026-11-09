@@ -22,7 +22,7 @@ const PATHS: { name: string; desc: string; slugs: string[] }[] = [
   },
   {
     name: '工程完整路径',
-    desc: '要做一台新电源：拓扑 → 建模 → 补偿 → 电感 → 保护 → 仿真，一条走完。',
+    desc: '要做一台新电源：拓扑 → 边界 → 建模 → 补偿 → 仿真验证 → 电感 → 保护，一条走完。',
     slugs: [
       'feedback-loop',
       'topologies',
@@ -30,14 +30,14 @@ const PATHS: { name: string; desc: string; slugs: string[] }[] = [
       'small-signal',
       'transfer-functions',
       'loop-compensation',
+      'simulation',
       'magnetics',
       'protection',
-      'simulation',
     ],
   },
   {
     name: '量产整改路径',
-    desc: '板子已经做出来了，但纹波超标、环路振荡、谐波过不了：从测量查起，再往回路里找。',
+    desc: '板子已经做出来了，但纹波超标、环路振荡、谐波过不了。按这个顺序查：测量 → 输入滤波 → 保护 → PFC → 多相。',
     slugs: ['measurement', 'input-filter', 'protection', 'pfc', 'multiphase'],
   },
   {
