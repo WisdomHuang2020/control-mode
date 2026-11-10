@@ -1,0 +1,288 @@
+import { useState, type FormEvent } from 'react'
+import { MessageSquare, Send, CheckCircle2, AlertTriangle, Loader2, ShieldCheck, Paperclip, X } from 'lucide-react'
+import { submitFeedback, fileToPayload, ApiError, isMirrorDeployment } from '../lib/feedbackApi'
+
+/** 涉及页面：与本站导航一一对应，读者选得中，作者也定位得到。 */
+const PAGE_OPTIONS = [
+  '首页',
+  '拓扑基础',
+  '工作原理',
+  '公式推导',
+  '特性曲线',
+  '设计工具',
+  '报告输出',
+  '其它 / 未指明',
+]
+
+const MIN_LEN = 10
+const MAX_LEN = 4000
+
+// 附件限制与后端常量保持一致（UPLOAD_DIR 那一段）。
+// 前端拦一道不是为了"防住坏人"——那由服务端负责——而是为了让读者在选文件时
+// 就知道超限，而不是填完一整篇问题描述、点了提交才被打回。
+const MAX_FILES = 3
+const MAX_FILE_MB = 2
+const ACCEPT = 'image/png,image/jpeg,image/webp,image/gif,application/pdf,text/plain,text/csv'
+
+export default function Feedback() {
+  const [page, setPage] = useState(PAGE_OPTIONS[0])
+  const [content, setContent] = useState('')
+  const [contact, setContact] = useState('')
+  const [honeypot, setHoneypot] = useState('')
+  const [files, setFiles] = useState<File[]>([])
+  const [fileErr, setFileErr] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const [done, setDone] = useState(false)
+
+  const mirror = isMirrorDeployment()
+  const tooShort = content.trim().length > 0 && content.trim().length < MIN_LEN
+
+  function handleFiles(list: FileList | null) {
+    setFileErr('')
+    if (!list || list.length === 0) return
+    const merged = [...files, ...Array.from(list)]
+    if (merged.length > MAX_FILES) {
+      setFileErr(`最多 ${MAX_FILES} 个附件。`)
+      return
+    }
+    const tooBig = merged.find((f) => f.size > MAX_FILE_MB * 1024 * 1024)
+    if (tooBig) {
+      setFileErr(`「${tooBig.name}」超过 ${MAX_FILE_MB} MB，请先压缩或只截取相关部分。`)
+      return
+    }
+    setFiles(merged)
+  }
+
+  function removeFile(i: number) {
+    setFiles(files.filter((_, j) => j !== i))
+    setFileErr('')
+  }
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    setError('')
+
+    if (content.trim().length < MIN_LEN) {
+      setError(`问题描述至少 ${MIN_LEN} 个字，请写清是哪一项结果、期望值与实际值的差异。`)
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      const payloadFiles = files.length ? await Promise.all(files.map(fileToPayload)) : undefined
+      await submitFeedback({
+        page,
+        content: content.trim(),
+        contact: contact.trim() || undefined,
+        website: honeypot,
+        files: payloadFiles,
+      })
+      setDone(true)
+      setContent('')
+      setContact('')
+      setFiles([])
+      setFileErr('')
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : '网络异常，提交未成功，请稍后再试。')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (done) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-12">
+        <div className="card-surface p-8 text-center">
+          <CheckCircle2 className="w-12 h-12 text-success mx-auto mb-4" />
+          <h1 className="text-lg font-semibold text-text-primary mb-2">已收到，谢谢</h1>
+          <p className="text-sm text-text-secondary leading-relaxed max-w-md mx-auto">
+            留言已提交。你的反馈不会公开展示，仅作者本人可在后台看到。
+            如果能复现问题，我会核对公式与边界条件后修正。
+          </p>
+          <button
+            onClick={() => setDone(false)}
+            className="mt-6 px-4 py-2 rounded-md text-sm font-medium text-primary-light border border-primary-light/40 hover:bg-primary-dark/30 transition-colors"
+          >
+            再写一条
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-12 space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-text-primary flex items-center gap-2.5">
+          <MessageSquare className="w-6 h-6 text-primary-light" />
+          读者留言
+        </h1>
+        <p className="text-sm text-text-secondary leading-relaxed mt-2">
+          本站的推导与计算都是工程近似，公式、边界条件和单位换算可能仍有疏漏。
+          如果你发现结果与手算、数据手册或实测不符，请在这里指出——
+          <strong className="text-text-primary">具体到哪里不对，比「好像有问题」有用得多。</strong>
+        </p>
+      </div>
+
+      <div className="p-3.5 rounded-md bg-primary-dark/25 border border-primary-light/25 flex gap-2.5">
+        <ShieldCheck className="w-4 h-4 text-primary-light shrink-0 mt-0.5" />
+        <p className="text-xs text-text-secondary leading-relaxed">
+          留言<strong className="text-text-primary">不会公开展示</strong>，也不会出现在任何页面上。
+          只有作者能在后台查看。若你留了联系方式，仅用于回复你的问题。
+        </p>
+      </div>
+
+      {mirror && (
+        <div className="p-3.5 rounded-md bg-accent/10 border border-accent/30 flex gap-2.5">
+          <AlertTriangle className="w-4 h-4 text-accent shrink-0 mt-0.5" />
+          <p className="text-xs text-text-secondary leading-relaxed">
+            当前是 GitHub Pages 镜像站，没有留言后端。请到
+            <code className="mx-1 font-mono text-text-primary">www.control-mode.power-knowledge.tech</code>
+            提交。
+          </p>
+        </div>
+      )}
+
+      <div className="card-surface p-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label htmlFor="fb-page" className="block text-xs font-medium text-text-secondary mb-1.5">
+              涉及页面
+            </label>
+            <select id="fb-page" value={page} onChange={(e) => setPage(e.target.value)} className="input-field w-full">
+              {PAGE_OPTIONS.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <div className="flex items-baseline justify-between mb-1.5">
+              <label htmlFor="fb-content" className="block text-xs font-medium text-text-secondary">
+                问题描述 <span className="text-danger">*</span>
+              </label>
+              <span className={`text-[11px] tabular ${content.length > MAX_LEN ? 'text-danger' : 'text-text-muted'}`}>
+                {content.length} / {MAX_LEN}
+              </span>
+            </div>
+            <textarea
+              id="fb-content"
+              value={content}
+              onChange={(e) => setContent(e.target.value.slice(0, MAX_LEN))}
+              rows={8}
+              placeholder={
+                '建议写清四点：\n' +
+                '1. 输入了什么（如 Vin = 400 V、Vout = 48 V、Pout = 300 W）\n' +
+                '2. 页面给出的结果\n' +
+                '3. 你认为正确的值，以及依据（手算过程 / 数据手册页码 / 实测波形）\n' +
+                '4. 若涉及公式，指出哪一步推导有问题'
+              }
+              className="input-field w-full resize-y leading-relaxed"
+              style={{ fontFamily: 'inherit' }}
+            />
+            {tooShort && <p className="text-[11px] text-accent mt-1.5">再多写几个字，方便定位问题。</p>}
+          </div>
+
+          <div>
+            <label htmlFor="fb-contact" className="block text-xs font-medium text-text-secondary mb-1.5">
+              联系方式 <span className="text-text-muted font-normal">（可选，便于回复你）</span>
+            </label>
+            <input
+              id="fb-contact"
+              type="text"
+              value={contact}
+              onChange={(e) => setContact(e.target.value)}
+              maxLength={200}
+              placeholder="邮箱 / 微信号，留空也可以"
+              className="input-field w-full"
+              style={{ fontFamily: 'inherit' }}
+              autoComplete="off"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="fb-files" className="block text-xs font-medium text-text-secondary mb-1.5">
+              附图 / 附件{' '}
+              <span className="text-text-muted font-normal">（可选，最多 {MAX_FILES} 个，单个 ≤ {MAX_FILE_MB} MB）</span>
+            </label>
+            <input
+              id="fb-files"
+              type="file"
+              multiple
+              accept={ACCEPT}
+              onChange={(e) => {
+                handleFiles(e.target.files)
+                // 清空 value：否则同一个文件连续选两次不会触发 change，
+                // 而用户往往正是在"选错了再选一次"的时候遇到这个问题
+                e.target.value = ''
+              }}
+              className="block w-full text-xs text-text-secondary file:mr-3 file:cursor-pointer file:rounded-md file:border file:border-border file:bg-surface-elevated file:px-3 file:py-1.5 file:text-xs file:text-text-secondary hover:file:border-primary-light hover:file:text-primary-light"
+            />
+            <p className="text-[11px] text-text-muted mt-1.5 leading-relaxed">
+              支持 PNG / JPEG / WebP / GIF / PDF / TXT / CSV。截图比文字更能说明问题，但请只截相关区域。
+            </p>
+
+            {files.length > 0 && (
+              <ul className="mt-2 space-y-1">
+                {files.map((f, i) => (
+                  <li key={`${f.name}-${i}`} className="flex items-center gap-2 text-[11px] text-text-secondary">
+                    <Paperclip className="w-3 h-3 shrink-0" />
+                    <span className="truncate">{f.name}</span>
+                    <span className="shrink-0 text-text-muted tabular">{Math.round(f.size / 1024)} KB</span>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(i)}
+                      aria-label={`移除 ${f.name}`}
+                      className="ml-auto shrink-0 text-text-muted hover:text-danger transition-colors"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {fileErr && <p className="text-[11px] text-danger mt-1.5">{fileErr}</p>}
+          </div>
+
+          {/* 蜜罐：对真人不可见，机器人会填。填了则静默丢弃。 */}
+          <div aria-hidden="true" className="absolute opacity-0 pointer-events-none -z-10 h-0 overflow-hidden">
+            <label htmlFor="fb-website">Website</label>
+            <input
+              id="fb-website"
+              type="text"
+              tabIndex={-1}
+              autoComplete="off"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+            />
+          </div>
+
+          {error && (
+            <div className="p-3 rounded-md bg-danger/10 border border-danger/30 flex gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-danger shrink-0 mt-0.5" />
+              <p className="text-xs text-text-secondary leading-relaxed">{error}</p>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between gap-4 pt-1">
+            <p className="text-[11px] text-text-muted leading-relaxed">
+              提交即为同意作者在改进本站时参考该反馈。
+            </p>
+            <button
+              type="submit"
+              disabled={submitting || content.trim().length < MIN_LEN || mirror}
+              className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium bg-primary text-white hover:bg-primary-light disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+              {submitting ? '提交中…' : '提交'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}

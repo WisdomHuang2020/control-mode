@@ -5,6 +5,8 @@ import Handbook from './pages/Handbook'
 import Chapter from './pages/Chapter'
 import SToZ from './pages/SToZ'
 import Tustin from './pages/Tustin'
+import Feedback from './pages/Feedback'
+import Admin from './pages/Admin'
 
 // 路由模式按托管环境选择，与站群其余 React 站同一套逻辑：
 //  • 自有域名由 nginx 提供 SPA 回退 ⇒ BrowserRouter，URL 干净。
@@ -28,6 +30,8 @@ export default function App() {
           <Route path="/handbook/:slug" element={<Chapter />} />
           <Route path="/learn/s-to-z" element={<SToZ />} />
           <Route path="/tools/tustin" element={<Tustin />} />
+          <Route path="/feedback" element={<Feedback />} />
+          <Route path="/admin" element={<Admin />} />
           {/* 未知路径回首页：SPA 由 nginx 回退，这里给出确定行为，不显示空白页。 */}
           <Route path="*" element={<Home />} />
         </Routes>
