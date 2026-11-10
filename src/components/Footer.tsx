@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Github, BookOpen, Calculator, House } from 'lucide-react'
+import { BookOpen, Calculator, House } from 'lucide-react'
 import BrandMark from './BrandMark'
 import VersionBadge from './VersionBadge'
 
@@ -69,9 +69,7 @@ export default function Footer() {
           </div>
           <div className="flex items-center gap-5">
             <VersionBadge />
-            <a href="https://github.com/WisdomHuang2020/control-mode" target="_blank" rel="noreferrer" className="flex items-center gap-2 text-text-muted hover:text-text-secondary text-sm transition-colors">
-              <Github className="w-4 h-4" /> GitHub
-            </a>
+            {/* 2026-11-10 站群统一口径：页面上的 GitHub 源码仓库链接与图标全部移除。 */}
           </div>
         </div>
 
