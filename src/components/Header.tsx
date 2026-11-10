@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, House, BookOpen, Calculator, Layers, Library } from 'lucide-react'
+import { Menu, X, House, BookOpen, Calculator, Layers, Library, MessageSquare } from 'lucide-react'
 import BrandMark from './BrandMark'
 import VersionBadge from './VersionBadge'
 import ThemeSwitcher from './ThemeSwitcher'
@@ -10,6 +10,8 @@ const navLinks = [
   { path: '/handbook', label: '手册', icon: Library },
   { path: '/learn/s-to-z', label: '培训', icon: BookOpen },
   { path: '/tools/tustin', label: '工具', icon: Calculator },
+  // 留言入口放末位：读者读到某一页发现问题时，「找话说」的自然位置在导航最后。
+  { path: '/feedback', label: '留言', icon: MessageSquare },
 ]
 
 export default function Header() {
