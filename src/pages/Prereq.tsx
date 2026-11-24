@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, Clock, Film, GraduationCap, Image as ImageIcon, Sigma, Sparkles } from 'lucide-react'
 import RichText from '../components/RichText'
 import { PREREQ_CHAPTERS, PREREQ_STATS } from '../data/prereq'
-import { BOOK_CMATH, BOOK_MODERN, EXTERNAL_NOTE } from '../data/prereq/types'
+import { BOOK_CMATH, BOOK_MODERN, BOOK_TUTORIAL, EXTERNAL_NOTE } from '../data/prereq/types'
 
 /**
  * 前置知识地图页。
@@ -21,7 +21,7 @@ export default function Prereq() {
         </div>
         <h1 className="text-3xl md:text-4xl font-bold tracking-tight">前置知识：把手册里默认你会的那部分数学补上</h1>
         <p className="mt-3 text-text-secondary leading-relaxed">
-          <RichText text="手册第 1 阶开始讲「开关电源在控什么」，但从第 7 阶起会直接用到复平面、传递函数、采样定理、范数与随机过程。这些前置条件散落在两本数学教材里，书里写得很全，但**结构是隐性的**——你得自己把「这一章会用到哪一条」拼出来。这一模块做的就是这件事：把隐性的依赖关系显性化，配书内原图、动态视频与可交互的图。" />
+          <RichText text="手册第 1 阶开始讲「开关电源在控什么」，但从第 7 阶起会直接用到复平面、传递函数、采样定理、范数与随机过程。这些前置条件散落在两本数学教材里，书里写得很全，但**结构是隐性的**——你得自己把「这一章会用到哪一条」拼出来。这一模块做的就是这件事：把隐性的依赖关系显性化，配书内原图、动态视频与可交互的图。末章再加一张全景图，把频率域、复频域、离散域与旋转坐标系摆到一起——三相并网与矢量控制依赖的 Clarke 与 Park，就在那里。" />
         </p>
 
         <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-text-muted">
@@ -42,10 +42,10 @@ export default function Prereq() {
       </header>
 
       <div className="section-h">
-        <h2>两本源书</h2>
+        <h2>三份来源：两本教材 + 一份工程速查稿</h2>
         <div className="line" />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="card-surface p-5">
           <div className="font-mono text-[10px] tracking-[0.12em] text-primary-light uppercase mb-2">SOURCE · 01</div>
           <h3 className="font-semibold text-text-primary mb-2">{BOOK_CMATH}</h3>
@@ -62,10 +62,19 @@ export default function Prereq() {
             概率论与随机过程（第 4、5 章）。
           </p>
         </div>
+        <div className="card-surface p-5 border-dashed">
+          <div className="font-mono text-[10px] tracking-[0.12em] text-primary-light uppercase mb-2">SOURCE · 03</div>
+          <h3 className="font-semibold text-text-primary mb-2">{BOOK_TUTORIAL}</h3>
+          <p className="text-sm leading-relaxed text-text-secondary">
+            第 7 章「变换全景」里坐标变换与进阶工具部分的来源。<strong className="text-text-primary">它不是书</strong>
+            ：没有书内节号，没有页码可回溯，也不进知识库。本站只用它写「这东西干什么、什么时候用、
+            用错会怎样」，不据此代写推导。性质与上面两本不同，所以单列一张卡。
+          </p>
+        </div>
       </div>
 
       <div className="section-h">
-        <h2>六章，按依赖顺序</h2>
+        <h2>{PREREQ_STATS.chapters} 章，按依赖顺序</h2>
         <div className="line" />
       </div>
       <div className="space-y-3">
@@ -115,11 +124,14 @@ export default function Prereq() {
         <p>
           <RichText text="**写不出出处的结论不写。** 例如「卡尔曼滤波」在两本书的正文里检索不到对应条目（该书用英文名 Kalman，位于 §5.5），所以这一模块只引用它对「好估计」的三个定义与 Wiener 过程，不给递推式，也不代写推导。" />
         </p>
+        <p>
+          <RichText text="**第 7 章单列一条口径。** 「变换全景」讲的是坐标变换与进阶工具，这部分在两本教材里没有对应章节，来源是一份外部工程速查稿——它没有书内节号、没有页码可回溯，也不进知识库。所以那一章只写「这东西干什么、什么时候用、用错会怎样」，**不据此代写推导、不给未核对的递推式**。引用时请把它当索引用，别当定理用。" />
+        </p>
       </div>
 
       <div className="mt-8 flex flex-wrap items-center gap-3 text-sm text-text-muted">
         <Sparkles className="w-4 h-4 text-primary-light" />
-        <span>学完这六章，直接进</span>
+        <span>学完这 {PREREQ_STATS.chapters} 章，直接进</span>
         <Link to="/handbook" className="text-primary-light hover:underline">
           建模与控制手册第 1 阶
         </Link>

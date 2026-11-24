@@ -13,9 +13,9 @@ const fadeUp = {
 
 const entries = [
   {
-    to: '/math', k: 'PREREQ · 01', icon: GraduationCap, title: '前置知识：6 章数学',
-    desc: '以《控制工程数学基础（第2版）》《系统与控制中的近代数学基础（第2版）》为源，把手册默认你会的那部分数学显性化：复平面与映射、傅里叶、拉普拉斯、z 变换、泛函分析、概率与估计。每章配书内原图、动态视频与可交互图，出处标到节号与式号。',
-    status: '已上线 · 6 章',
+    to: '/math', k: 'PREREQ · 01', icon: GraduationCap, title: `前置知识：${PREREQ_STATS.chapters} 章数学`,
+    desc: '以《控制工程数学基础（第2版）》《系统与控制中的近代数学基础（第2版）》为源，把手册默认你会的那部分数学显性化：复平面与映射、傅里叶、拉普拉斯、z 变换、泛函分析、概率与估计。末章「变换全景」再补一张总图：Clarke 与 Park 的正反变换矩阵、dq 解耦、双 dq / 小波 / 卡尔曼等进阶工具，以及九种工具的选型速查表。每章配书内原图、动态视频与可交互图，出处标到节号与式号。',
+    status: `已上线 · ${PREREQ_STATS.chapters} 章`,
   },
   {
     to: '/handbook', k: 'HANDBOOK · 01', icon: Library, title: '建模与控制手册',
@@ -127,7 +127,7 @@ export default function Home() {
 
         <div className="section-h" id="scope"><h2>本轮预览的范围</h2><div className="line" /></div>
         <div className="card-surface p-6">
-          <p className="text-text-secondary leading-relaxed"><strong className="text-text-primary">已经做的：</strong>手册 18 阶 / 5 个阶段（建模与控制的完整主线 + 6 个专题）、前置知识 6 章（两本外部数学教材的显性化，含书内原图、动态视频与交互图）、S→Z 长篇专题 1 篇（逐条公式溯源）、Tustin 计算器 1 个（内核可单独复核）。</p>
+          <p className="text-text-secondary leading-relaxed"><strong className="text-text-primary">已经做的：</strong>手册 18 阶 / 5 个阶段（建模与控制的完整主线 + 6 个专题）、前置知识 {PREREQ_STATS.chapters} 章（前 6 章是两本外部数学教材的显性化，末章「变换全景」补 Clarke / Park 与进阶工具的选型，含书内原图、动态视频与交互图）、S→Z 长篇专题 1 篇（逐条公式溯源）、Tustin 计算器 1 个（内核可单独复核）。</p>
           <p className="text-text-secondary leading-relaxed mt-3"><strong className="text-text-primary">范围与还没做的：</strong>本手册只覆盖建模与控制，磁性元件设计、EMI 与布局、热设计、可靠性工程不在范围内。知识库 20,596 条公式只用到约 120 条，知识库的 7,522 张书内插图一张未用——前置知识模块用的 {PREREQ_STATS.figures} 张插图来自两本<strong className="text-text-primary">外部</strong>数学教材，没有进入 RAG 库，因此不计入这组统计。跨书检索已开放（<Link to="/search" className="text-primary-light hover:underline">/search</Link>）：17,292 块文本与 20,596 条公式都能全文定位，但那是<strong className="text-text-primary">字面匹配</strong>，不是语义问答；知识图谱仍是 9 实体 / 8 关系的模板，没有建成真图谱。这些不是「即将上线」，是没有排期。</p>
           <div className="mt-5 pt-5 border-t border-border text-sm text-text-muted leading-relaxed">
             技术栈与站群一致：Vite + React + TypeScript + Tailwind CSS；公式由 KaTeX 本地打包，无 CDN 依赖；

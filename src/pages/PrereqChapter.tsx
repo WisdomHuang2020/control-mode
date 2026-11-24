@@ -5,7 +5,7 @@ import MathBlock from '../components/MathBlock'
 import MathDemo from '../components/MathDemo'
 import RichText from '../components/RichText'
 import { PREREQ_CHAPTERS, prereqBySlug, prereqNeighbors } from '../data/prereq'
-import { EXTERNAL_NOTE } from '../data/prereq/types'
+import { BOOK_TUTORIAL, EXTERNAL_NOTE, TUTORIAL_NOTE } from '../data/prereq/types'
 import type { PrereqBlock } from '../data/prereq/types'
 import { chapterBySlug } from '../data/handbook'
 
@@ -85,38 +85,53 @@ function renderBlock(b: PrereqBlock, i: number) {
           ))}
         </ul>
       )
-    case 'table':
+    case 'table': {
+      // 列数 ≥4 的表在窄屏要横向滚动（见 index.css 的 .tbl-wide/.tbl-mid）。
+      // 光能滚还不够：手机浏览器把滚动条藏起来，读者看不出右边还有内容，
+      // 会以为表格被截断。所以补一行只在窄屏出现的提示；宽屏表格本来就铺满，不显示。
+      const scrollable = b.head.length >= 4
       return (
-        <figure key={i} className="my-6 overflow-x-auto">
-          <table className="data-table small">
-            <thead>
-              <tr>
-                {b.head.map((h, k) => (
-                  <th key={k}>
-                    <RichText text={h} />
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {b.rows.map((row, r) => (
-                <tr key={r}>
-                  {row.map((cell, c) => (
-                    <td key={c}>
-                      <RichText text={cell} />
-                    </td>
+        <>
+          <figure
+            key={i}
+            className={`my-6 overflow-x-auto ${
+              b.head.length >= 5 ? 'tbl-wide' : scrollable ? 'tbl-mid' : ''
+            }`}
+          >
+            <table className="data-table small">
+              <thead>
+                <tr>
+                  {b.head.map((h, k) => (
+                    <th key={k}>
+                      <RichText text={h} />
+                    </th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          {b.caption && (
-            <figcaption className="text-sm text-text-muted leading-relaxed">
-              <RichText text={b.caption} />
-            </figcaption>
+              </thead>
+              <tbody>
+                {b.rows.map((row, r) => (
+                  <tr key={r}>
+                    {row.map((cell, c) => (
+                      <td key={c}>
+                        <RichText text={cell} />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {b.caption && (
+              <figcaption className="text-sm text-text-muted leading-relaxed">
+                <RichText text={b.caption} />
+              </figcaption>
+            )}
+          </figure>
+          {scrollable && (
+            <p className="-mt-3 mb-4 text-[11px] text-text-muted sm:hidden">← 这张表可以左右滑动看全</p>
           )}
-        </figure>
+        </>
       )
+    }
     case 'callout':
       return (
         <Callout key={i} type={b.kind} label={b.title}>
@@ -173,6 +188,10 @@ export default function PrereqChapter() {
   }
 
   const plain = (t: string) => t.replace(/\$([^$]+)\$/g, '$1')
+  // 本章是否含「外部工程速查稿」这类无书内坐标的出处（目前只有第 7 章）。
+  // 有它就不能再说「书内坐标」，也不能只挂 EXTERNAL_NOTE —— 否则等于
+  // 把一份没有页码可回溯的稿子，混进「每条结论都能翻书核对」的承诺里。
+  const hasTutorialSource = ch.sources.some((s) => s.book === BOOK_TUTORIAL)
   const headings = ch.blocks
     .map((b, i) => (b.t === 'h' ? { id: `h-${i}`, text: plain(b.x) } : null))
     .filter(Boolean) as { id: string; text: string }[]
@@ -311,7 +330,7 @@ export default function PrereqChapter() {
           </h2>
           <div className="rounded-lg border border-border bg-surface px-4 py-4">
             <div className="flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] text-text-muted uppercase mb-2">
-              <BookMarked className="w-3.5 h-3.5" /> 书内坐标
+              <BookMarked className="w-3.5 h-3.5" /> {hasTutorialSource ? '出处（含外部速查稿）' : '书内坐标'}
             </div>
             <ul className="space-y-1.5 text-sm text-text-secondary">
               {ch.sources.map((s, i) => (
@@ -321,6 +340,9 @@ export default function PrereqChapter() {
               ))}
             </ul>
             <p className="mt-3 text-xs text-text-muted leading-relaxed">{EXTERNAL_NOTE}</p>
+            {hasTutorialSource && (
+              <p className="mt-2 text-xs text-text-muted leading-relaxed">{TUTORIAL_NOTE}</p>
+            )}
           </div>
 
           <div className="mt-10 flex flex-col sm:flex-row gap-3">

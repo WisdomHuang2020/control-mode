@@ -1,10 +1,17 @@
 import type { PrereqChapter } from './types'
 import { PART1 } from './part1'
+import { PART2 } from './part2'
 
 export * from './types'
 
-/** 全部前置知识章节，顺序即「先数学、后控制」的依赖顺序。 */
-export const PREREQ_CHAPTERS: PrereqChapter[] = [...PART1]
+/**
+ * 全部前置知识章节，顺序即「先数学、后控制」的依赖顺序。
+ *
+ * 第 1–6 章（PART1）来自两本外部数学教材，每条结论都能回到节号与式号；
+ * 第 7 章（PART2）是变换全景，坐标变换与进阶工具部分来自一份外部工程速查稿，
+ * 出处性质不同（见 BOOK_TUTORIAL / TUTORIAL_NOTE），不要合并成一个数组字面量。
+ */
+export const PREREQ_CHAPTERS: PrereqChapter[] = [...PART1, ...PART2]
 
 export function prereqBySlug(slug: string | undefined): PrereqChapter | undefined {
   if (!slug) return undefined

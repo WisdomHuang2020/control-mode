@@ -265,6 +265,16 @@ html[data-theme='sea-salt'] { --color-primary-dark: #d4e9ea; }
   .data-table td { color: var(--color-text-secondary); }
   .data-table.small { font-size: .82rem; }
 
+  /* 窄屏下的多列对照表：让它横向滚动，而不是把每一格压成两三个字。
+     实测（375px，5 列）：table 是 width:100%，浏览器会把 343px 平均分给 5 列，
+     每格每行只剩 2–3 个汉字，整张表竖成 1200px 高，完全没法读。
+     给列数多的表一个下限宽度，外层 figure 的 overflow-x:auto 才真正起作用。
+     只对 .tbl-wide / .tbl-mid（列数 ≥4）生效，三五列以内的短表不受影响。 */
+  @media (max-width: 640px) {
+    figure.tbl-wide table { min-width: 40rem; }
+    figure.tbl-mid table { min-width: 32rem; }
+  }
+
   .callout { border: 1px solid var(--color-border); border-left-width: 3px; border-radius: 0 8px 8px 0; background: var(--color-surface); padding: 1rem 1.25rem; margin: 1.4rem 0; }
   .callout .lbl { display: inline-block; font-family: var(--font-mono); font-size: .7rem; letter-spacing: .1em; padding: .15rem .5rem; border-radius: 4px; margin-bottom: .5rem; }
   .callout p { margin: .35rem 0; font-size: .9rem; line-height: 1.85; color: var(--color-text-secondary); }

@@ -2,7 +2,7 @@ import type { PrereqChapter } from './types'
 import { BOOK_CMATH, BOOK_MODERN } from './types'
 
 /**
- * 前置知识 6 章。
+ * 前置知识第 1–6 章（第 7 章「变换全景」在 part2.ts，来源性质不同，故分文件）。
  *
  * 取材纪律：
  *  ① 每条结论都能在书里找到对应节号与式号，出处写在每章末尾。
