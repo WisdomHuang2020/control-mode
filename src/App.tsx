@@ -5,6 +5,7 @@ import Handbook from './pages/Handbook'
 import Chapter from './pages/Chapter'
 import Prereq from './pages/Prereq'
 import PrereqChapter from './pages/PrereqChapter'
+import Search from './pages/Search'
 import SToZ from './pages/SToZ'
 import Tustin from './pages/Tustin'
 import Feedback from './pages/Feedback'
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/handbook/:slug" element={<Chapter />} />
           <Route path="/math" element={<Prereq />} />
           <Route path="/math/:slug" element={<PrereqChapter />} />
+          <Route path="/search" element={<Search />} />
           <Route path="/learn/s-to-z" element={<SToZ />} />
           <Route path="/tools/tustin" element={<Tustin />} />
           <Route path="/feedback" element={<Feedback />} />

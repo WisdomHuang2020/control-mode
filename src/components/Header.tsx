@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, House, BookOpen, Calculator, Layers, Library, GraduationCap, MessageSquare } from 'lucide-react'
+import { Menu, X, House, BookOpen, Calculator, Layers, Library, GraduationCap, MessageSquare, Search } from 'lucide-react'
 import BrandMark from './BrandMark'
 import VersionBadge from './VersionBadge'
 import ThemeSwitcher from './ThemeSwitcher'
@@ -9,6 +9,9 @@ const navLinks = [
   { path: '/', label: '首页', icon: Layers },
   { path: '/math', label: '前置', icon: GraduationCap },
   { path: '/handbook', label: '手册', icon: Library },
+  // 检索挨着手册：它的用途就是「在手册覆盖的 43 本书里定位原文」，
+  // 读者从手册里没找到想要的那一句时，下一步就是来这里。
+  { path: '/search', label: '检索', icon: Search },
   { path: '/learn/s-to-z', label: '培训', icon: BookOpen },
   { path: '/tools/tustin', label: '工具', icon: Calculator },
   // 留言入口放末位：读者读到某一页发现问题时，「找话说」的自然位置在导航最后。

@@ -96,13 +96,21 @@ export default function Home() {
               </Link>
             </motion.div>
           ))}
-          <motion.div custom={4} initial={initialState} animate="visible" variants={fadeUp}>
-            <div className="card-surface feature-card dim h-full md:col-span-2 lg:col-span-4">
+          {/* col-span 必须挂在 motion.div 上——它才是 grid 的直接子元素。
+              写在内层 div 上不会生效（上一版就写错了位置）。 */}
+          <motion.div
+            custom={4}
+            initial={initialState}
+            animate="visible"
+            variants={fadeUp}
+            className="md:col-span-2 lg:col-span-4"
+          >
+            <Link to="/search" className="card-surface feature-card h-full block hover:no-underline">
               <div className="k">SEARCH · 02</div>
-              <h3 className="flex items-center gap-2"><Search className="w-4 h-4" />全库检索</h3>
-              <p>17,292 块文本 + 20,596 条公式的跨书检索。当前索引是 133 MB 的服务端格式，正在重编码为可上线的分片格式。</p>
-              <span className="status">规划中</span>
-            </div>
+              <h3 className="flex items-center gap-2"><Search className="w-4 h-4 text-primary-light" />全库检索</h3>
+              <p>17,292 块文本 + 20,596 条公式的跨书检索，索引在浏览器内跑，查询不出本机。术语级字面匹配：<code className="font-mono text-xs">ZVS</code>、<code className="font-mono text-xs">右半平面零点</code>、<code className="font-mono text-xs">compensator</code> 都能直接定位到原文段落；它不做语义推理，长问句要拆成实词。</p>
+              <span className="status">已上线 · 毫秒级</span>
+            </Link>
           </motion.div>
         </div>
 
@@ -120,7 +128,7 @@ export default function Home() {
         <div className="section-h" id="scope"><h2>本轮预览的范围</h2><div className="line" /></div>
         <div className="card-surface p-6">
           <p className="text-text-secondary leading-relaxed"><strong className="text-text-primary">已经做的：</strong>手册 18 阶 / 5 个阶段（建模与控制的完整主线 + 6 个专题）、前置知识 6 章（两本外部数学教材的显性化，含书内原图、动态视频与交互图）、S→Z 长篇专题 1 篇（逐条公式溯源）、Tustin 计算器 1 个（内核可单独复核）。</p>
-          <p className="text-text-secondary leading-relaxed mt-3"><strong className="text-text-primary">范围与还没做的：</strong>本手册只覆盖建模与控制，磁性元件设计、EMI 与布局、热设计、可靠性工程不在范围内。知识库 20,596 条公式只用到约 120 条，知识库的 7,522 张书内插图一张未用——前置知识模块用的 {PREREQ_STATS.figures} 张插图来自两本<strong className="text-text-primary">外部</strong>数学教材，没有进入 RAG 库，因此不计入这组统计；跨书检索（17,292 块）尚未开放成可交互页面。这些不是「即将上线」，是没有排期。</p>
+          <p className="text-text-secondary leading-relaxed mt-3"><strong className="text-text-primary">范围与还没做的：</strong>本手册只覆盖建模与控制，磁性元件设计、EMI 与布局、热设计、可靠性工程不在范围内。知识库 20,596 条公式只用到约 120 条，知识库的 7,522 张书内插图一张未用——前置知识模块用的 {PREREQ_STATS.figures} 张插图来自两本<strong className="text-text-primary">外部</strong>数学教材，没有进入 RAG 库，因此不计入这组统计。跨书检索已开放（<Link to="/search" className="text-primary-light hover:underline">/search</Link>）：17,292 块文本与 20,596 条公式都能全文定位，但那是<strong className="text-text-primary">字面匹配</strong>，不是语义问答；知识图谱仍是 9 实体 / 8 关系的模板，没有建成真图谱。这些不是「即将上线」，是没有排期。</p>
           <div className="mt-5 pt-5 border-t border-border text-sm text-text-muted leading-relaxed">
             技术栈与站群一致：Vite + React + TypeScript + Tailwind CSS；公式由 KaTeX 本地打包，无 CDN 依赖；
             计算内核为独立模块，页面与内核可分别复核。
