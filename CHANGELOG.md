@@ -3,6 +3,28 @@
 本文件是版本节点的权威清单。版本号单一来源为 `package.json`，
 发版收尾必须跑 `npm run audit`（四方一致性审计），退出码非 0 不算发完。
 
+## [v1.7.1] - 2026-11-24
+
+**修 v1.7.0 的上线事故：`/search` 被同名静态目录吃掉，整条路由 403。**
+
+v1.7.0 把索引放在 `public/search/`，构建后就是 `dist/search/`。而站点路由也叫 `/search`。
+nginx 的 `try_files $uri $uri/ /index.html` 会先命中真实目录：
+
+```
+GET /search   → 301 /search/     （因为存在同名目录）
+GET /search/  → 403 Forbidden    （目录里没有 index.html，且禁止列目录）
+```
+
+于是首页卡片点进去是 403，而 `/search/index-text.json` 却是 200 —— 索引能取、页面打不开。
+
+修法：索引目录改名 `public/search-data/`，路由保持 `/search`。
+
+为什么本地 `vite preview` 没暴露这个问题：preview 没有 `try_files` 的逻辑，
+`/search` 直接回 SPA 的 index.html，看起来完全正常。**这个 bug 只有上线才看得到。**
+
+教训：**给 SPA 加静态资源目录时，目录名必须避开所有路由路径。**
+以后的检查项：新增 `public/<name>/` 前，先确认 `<name>` 不是任何 `<Route path>` 段。
+
 ## [v1.7.0] - 2026-11-24
 
 **新增「全库检索」：43 本书、17,292 块文本、20,596 条公式，在浏览器里毫秒级定位。**

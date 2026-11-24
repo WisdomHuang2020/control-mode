@@ -41,8 +41,8 @@ await build({
 const core = await import(pathToFileURL(out).href)
 
 // ── 装载索引 ─────────────────────────────────────────────
-const textPath = path.join(root, 'public', 'search', 'index-text.json')
-const formulaPath = path.join(root, 'public', 'search', 'index-formula.json')
+const textPath = path.join(root, 'public', 'search-data', 'index-text.json')
+const formulaPath = path.join(root, 'public', 'search-data', 'index-formula.json')
 assert.ok(fs.existsSync(textPath), `索引不存在：${textPath}\n请先跑 05_工具脚本/构建索引/build_site_search_index.mjs`)
 assert.ok(fs.existsSync(formulaPath), `索引不存在：${formulaPath}`)
 

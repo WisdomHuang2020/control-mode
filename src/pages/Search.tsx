@@ -25,9 +25,13 @@ import {
  *      压在首页会把首屏拖死。所以做成独立路由，且只在进入本页时才下载。
  */
 
-/** 索引文件放在 public/search/，由 vite 原样拷贝、nginx gzip 传输。 */
-const TEXT_URL = '/search/index-text.json'
-const FORMULA_URL = '/search/index-formula.json'
+/**
+ * 索引文件放在 public/search-data/。
+ * 目录名**不能**叫 search —— 站点路由就是 /search，nginx 会优先把同名真实目录
+ * 301 到 /search/ 并因缺 index 返回 403，整条路由失效（2026-11-24 上线后实测踩到）。
+ */
+const TEXT_URL = '/search-data/index-text.json'
+const FORMULA_URL = '/search-data/index-formula.json'
 
 type LoadStage = 'idle' | 'loading' | 'parsing' | 'ready' | 'error'
 
