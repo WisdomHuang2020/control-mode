@@ -155,6 +155,43 @@ html[data-theme='sea-salt'] { --color-primary-dark: #d4e9ea; }
   .katex-display::-webkit-scrollbar { width: 0; height: 0; }
   .katex-display .katex { font-size: 1.1em; }
 
+  /* ── 检索结果里的公式 ─────────────────────────────────────────────
+     KaTeX 默认 .katex 是 1.21em、.katex-display 带 1rem 上下边距且居中。
+     直接放进检索片段会变成「一段正文里夹着几个居中的大公式」，行距被打乱。
+     这里统一压到贴近正文的字号、改成左对齐、并把边距收到几乎为零。 */
+  .search-snippet .katex { font-size: 1.05em; }
+  .search-snippet .katex-display {
+    display: inline-block;
+    margin: 0.15rem 0;
+    text-align: left;
+    max-width: 100%;
+    vertical-align: middle;
+  }
+  /* 渲染失败的公式：原样露出 LaTeX 源码，不用红字糊过去。
+     用虚线边框提示「这段没能渲染」，而不是让读者以为是排版坏了。 */
+  .snippet-raw-math {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    color: var(--color-text-muted);
+    background-color: var(--color-surface-elevated);
+    border-radius: 4px;
+    padding: 0 0.25em;
+    overflow-wrap: anywhere;
+  }
+  /* 命中词落在公式里：KaTeX 的 DOM 不塞 <mark>，改用整条公式加底色示意。 */
+  .math-hit {
+    background-color: color-mix(in srgb, var(--color-primary) 22%, transparent);
+    border-radius: 4px;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 22%, transparent);
+  }
+
+  /* 公式页签里的块级公式 */
+  .snippet-display-math .katex-display {
+    margin: 0.25rem 0;
+    text-align: left;
+  }
+  .snippet-display-math .katex { font-size: 1.05em; }
+
   .card-surface {
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);

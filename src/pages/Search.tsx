@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { AlertTriangle, BookOpen, Loader2, Search as SearchIcon, Sigma } from 'lucide-react'
+import MathText, { DisplayMath } from '../components/MathText'
 import {
   type FormulaIndex,
   type Hit,
@@ -81,23 +82,11 @@ async function fetchJsonWithProgress<T>(
   return JSON.parse(text) as T
 }
 
-/** 把命中区间渲染成 <mark>。用 React 元素拼接，不走 dangerouslySetInnerHTML。 */
-function Highlight({ text, ranges }: { text: string; ranges: Array<[number, number]> }) {
-  if (!ranges.length) return <>{text}</>
-  const nodes: React.ReactNode[] = []
-  let cur = 0
-  ranges.forEach(([s, e], i) => {
-    if (s > cur) nodes.push(text.slice(cur, s))
-    nodes.push(
-      <mark key={i} className="bg-primary/25 text-text-primary rounded-sm px-0.5">
-        {text.slice(s, e)}
-      </mark>
-    )
-    cur = e
-  })
-  if (cur < text.length) nodes.push(text.slice(cur))
-  return <>{nodes}</>
-}
+/**
+ * 片段渲染：正文走 React 节点、公式走 KaTeX（见 components/MathText.tsx）。
+ * 早先这里只有一个纯文本 Highlight，`$...$` 会原样露在结果里 ——
+ * 而这个库 19% 的块含 LaTeX，露原文等于把最要紧的内容丢掉。
+ */
 
 export default function Search() {
   const [params, setParams] = useSearchParams()
@@ -397,8 +386,8 @@ function TextResults({
               {/* break-words 是必需的：OCR 出来的正文里夹着 LaTeX 与 URL 这类
                   无空格长串（如 \frac{1}{2\pi R{\text{ESR}}C{\text{out}}}），
                   pre-wrap 只在空格处断行，窄屏下会把卡片撑破（实测 375px 溢出 44px）。 */}
-              <p className="text-sm leading-relaxed text-text-secondary whitespace-pre-wrap break-words">
-                <Highlight text={h.snippet} ranges={h.ranges} />
+              <p className="search-snippet text-sm leading-relaxed text-text-secondary whitespace-pre-wrap break-words">
+                <MathText text={h.snippet} ranges={h.ranges} />
               </p>
             </article>
           )
@@ -442,11 +431,16 @@ function FormulaResults({
                 {h.row.n ? ` · 式 ${h.row.n}` : ''}
               </span>
             </div>
-            <pre className="overflow-x-auto text-xs font-mono text-text-secondary bg-surface-elevated rounded p-2.5 mb-2">
-              {h.row.l}
-            </pre>
+            <div className="mb-2">
+              {/* 公式一律按块级渲染：这一页的公式多半是 \begin{align} / \tag 这类
+                  只能在 display 模式下成立的写法，按行内渲染会大面积为空。
+                  渲染不出来的（OCR 把 \frac 写成 frac 之类）由组件退回原样 <pre>。 */}
+              <DisplayMath latex={h.row.l} />
+            </div>
             {h.row.x && (
-              <p className="text-sm leading-relaxed text-text-secondary line-clamp-3 break-words">{h.row.x}</p>
+              <p className="search-snippet text-sm leading-relaxed text-text-secondary line-clamp-3 break-words">
+                <MathText text={h.row.x} />
+              </p>
             )}
           </article>
         ))}

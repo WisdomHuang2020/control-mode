@@ -108,7 +108,7 @@ export default function Home() {
             <Link to="/search" className="card-surface feature-card h-full block hover:no-underline">
               <div className="k">SEARCH · 02</div>
               <h3 className="flex items-center gap-2"><Search className="w-4 h-4 text-primary-light" />全库检索</h3>
-              <p>17,292 块文本 + 20,596 条公式的跨书检索，索引在浏览器内跑，查询不出本机。术语级字面匹配：<code className="font-mono text-xs">ZVS</code>、<code className="font-mono text-xs">右半平面零点</code>、<code className="font-mono text-xs">compensator</code> 都能直接定位到原文段落；它不做语义推理，长问句要拆成实词。</p>
+              <p>17,292 块文本 + 20,596 条公式的跨书检索，索引在浏览器内跑，查询不出本机。术语级字面匹配：<code className="font-mono text-xs">ZVS</code>、<code className="font-mono text-xs">右半平面零点</code>、<code className="font-mono text-xs">compensator</code> 都能直接定位到原文段落；结果里的公式按排版渲染，不是 LaTeX 源码。它不做语义推理，长问句要拆成实词。</p>
               <span className="status">已上线 · 毫秒级</span>
             </Link>
           </motion.div>

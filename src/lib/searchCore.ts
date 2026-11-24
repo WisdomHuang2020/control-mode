@@ -24,6 +24,7 @@
  * 这样「为什么Boost有右半平面零点」能切成 [boost, 右半平面零点] 并命中；
  * 但它是**字面匹配**，不懂同义与推理 —— 页面上必须如实这么写，不许包装成语义检索。
  */
+import { splitMathAware } from './mathText'
 
 export interface BookRef {
   /** 书名，原样显示 */
@@ -167,6 +168,38 @@ export interface Hit<T> {
 const SNIPPET_RADIUS = 90
 const MAX_HITS = 200
 
+/**
+ * 把片段边界贴到「公式段的边界」上，避免从公式中间切开。
+ *
+ * 为什么必须用 splitMathAware 而不是自己数 `$` 的奇偶：
+ * 书里的块是任意切分的，公式会被切断在块边界，于是块内 `$` 个数可能为奇数（实测有 63 个的），
+ * 配对整体错位一格。这时「从 0 数 `$` 的奇偶」得到的结论与页面实际采用的配对**不一致**，
+ * 按它切边界等于白切（实测那条整卡源码的结果就是这样漏掉的）。
+ * 用同一个分段函数，两边就一定对得上。
+ *
+ * 方向是**向内收**，不放宽：起点落在公式内就推到公式之后，终点落在公式内就退到公式之前。
+ * 曾经试过向外扩到定界符外侧，结果 `$$…$$` 动辄几百字符，卡片被撑到 600 字以上，整页变得极长。
+ * 唯一例外：收边界会越过命中的词时不动——宁可同框源码，也不能把命中切掉。
+ */
+function snapToMathBoundary(
+  text: string,
+  start0: number,
+  end0: number,
+  first: number
+): [number, number] {
+  // 绝大多数块没有公式，先挡掉，省下整块的分段开销
+  if (!text.includes('$')) return [start0, end0]
+
+  let start = start0
+  let end = end0
+  for (const g of splitMathAware(text)) {
+    if (g.latex === null) continue
+    if (g.s < start0 && start0 < g.e && g.e <= first) start = g.e
+    else if (g.s < end0 && end0 < g.e && g.s >= first) end = g.s
+  }
+  return [start, end]
+}
+
 /** 统计 needle 在 hay 中出现的次数，上限 cap 防止病态输入拖垮。 */
 function countOcc(hay: string, needle: string, cap = 30): number {
   let n = 0
@@ -276,8 +309,10 @@ function makeSnippet(
   }
   if (first < 0) return { snippet: text.slice(0, SNIPPET_RADIUS * 2), ranges: [] }
 
-  const start = Math.max(0, first - SNIPPET_RADIUS)
-  const end = Math.min(text.length, first + SNIPPET_RADIUS * 2)
+  const start0 = Math.max(0, first - SNIPPET_RADIUS)
+  const end0 = Math.min(text.length, first + SNIPPET_RADIUS * 2)
+  const [start, end] = snapToMathBoundary(text, start0, end0, first)
+
   const snippet = (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '')
   const offset = start > 0 ? 1 : 0
 

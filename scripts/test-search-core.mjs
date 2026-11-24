@@ -158,6 +158,46 @@ check('片段·首条结果确实含查询词', () => {
   assert.ok(top.snippet.toLowerCase().includes('zvs'), '首条结果的片段里没有 ZVS')
 })
 
+// 片段边界不能把公式切断。切断了窗口里就凑不出配对定界符，
+// 那条公式只能以 LaTeX 源码露出来 —— 这个库 19% 的块含公式，代价很大。
+//
+// 实测（8 组查询、862 条命中）：未做边界内收时 146 条片段定界符个数为奇数，
+// 内收后降到 37 条（4.3%）。剩下的没法在这层消掉：
+//   · 命中的词本身就在公式里 —— 收边界会把命中切掉，只能放弃；
+//   · 块内 `$` 个数本身就是奇数（书里的块是任意切分的，公式被切断在块边界），
+//     此时「从 0 数 `$` 的奇偶」与页面上实际采用的配对不一致。
+// 要根治得在构建期把定界符一次性配对好写进索引，属于数据层改动，不在本次范围。
+// 所以这里设 5% 的回归阈值，而不是要求归零。
+check('片段·定界符成对率 ≥ 95%（边界不许从公式中间切开）', () => {
+  const qs = ['右半平面零点', 'Boost 传递函数', 'ZVS', '峰值电流模式 斜坡补偿', '占空比']
+  let total = 0
+  let odd = 0
+  const samples = []
+  for (const q of qs) {
+    for (const h of core.searchText(textIdx, prepared, q).hits) {
+      total++
+      if ((h.snippet.match(/\$/g) || []).length % 2 === 1) {
+        odd++
+        if (samples.length < 2) samples.push(h.snippet.slice(0, 40))
+      }
+    }
+  }
+  const ratio = odd / total
+  console.log(`  片段定界符成对率 ${((1 - ratio) * 100).toFixed(1)}%（奇数 ${odd} / ${total}）`)
+  assert.ok(
+    ratio <= 0.05,
+    `奇数定界符片段占 ${(ratio * 100).toFixed(1)}%，超过 5% 阈值。样本：${JSON.stringify(samples)}`
+  )
+})
+
+check('片段·长度受控', () => {
+  for (const q of ['右半平面零点', 'Boost 传递函数']) {
+    for (const h of core.searchText(textIdx, prepared, q).hits) {
+      assert.ok(h.snippet.length <= 620, `片段长 ${h.snippet.length}，超出预期上限`)
+    }
+  }
+})
+
 // ── ⑤ 公式 ───────────────────────────────────────────────
 check('公式·上下文命中', () => {
   const r = core.searchFormulas(formulaIdx, '右半平面')
