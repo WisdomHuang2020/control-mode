@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'framer-motion'
-import { ArrowRight, BookOpen, Calculator, Search, ShieldCheck, GitBranch, Library } from 'lucide-react'
+import { ArrowRight, BookOpen, Calculator, Search, ShieldCheck, GitBranch, Library, GraduationCap } from 'lucide-react'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -11,6 +11,11 @@ const fadeUp = {
 }
 
 const entries = [
+  {
+    to: '/math', k: 'PREREQ · 01', icon: GraduationCap, title: '前置知识：6 章数学',
+    desc: '以《控制工程数学基础（第2版）》《系统与控制中的近代数学基础（第2版）》为源，把手册默认你会的那部分数学显性化：复平面与映射、傅里叶、拉普拉斯、z 变换、泛函分析、概率与估计。每章配书内原图、动态视频与可交互图，出处标到节号与式号。',
+    status: '已上线 · 6 章',
+  },
   {
     to: '/handbook', k: 'HANDBOOK · 01', icon: Library, title: '建模与控制手册',
     desc: '18 阶、5 个阶段：前 12 阶从「开关电源在控什么」一路走到 MPC，后 6 阶是专题——根轨迹、灵敏度、闭环性能、模型边界、饱和与抗饱和、前馈。每章一句话直觉 + 核心公式 + 对照表 + 常见误区 + 两道自测，末尾标出知识库出处。嫌长篇太厚，从这本开始。',
@@ -90,8 +95,8 @@ export default function Home() {
               </Link>
             </motion.div>
           ))}
-          <motion.div custom={2} initial={initialState} animate="visible" variants={fadeUp}>
-            <div className="card-surface feature-card dim h-full">
+          <motion.div custom={4} initial={initialState} animate="visible" variants={fadeUp}>
+            <div className="card-surface feature-card dim h-full md:col-span-2 lg:col-span-4">
               <div className="k">SEARCH · 02</div>
               <h3 className="flex items-center gap-2"><Search className="w-4 h-4" />全库检索</h3>
               <p>17,292 块文本 + 20,596 条公式的跨书检索。当前索引是 133 MB 的服务端格式，正在重编码为可上线的分片格式。</p>
@@ -113,8 +118,8 @@ export default function Home() {
 
         <div className="section-h" id="scope"><h2>本轮预览的范围</h2><div className="line" /></div>
         <div className="card-surface p-6">
-          <p className="text-text-secondary leading-relaxed"><strong className="text-text-primary">已经做的：</strong>手册 18 阶 / 5 个阶段（建模与控制的完整主线 + 6 个专题）、S→Z 长篇专题 1 篇（逐条公式溯源）、Tustin 计算器 1 个（内核可单独复核）。</p>
-          <p className="text-text-secondary leading-relaxed mt-3"><strong className="text-text-primary">范围与还没做的：</strong>本手册只覆盖建模与控制，磁性元件设计、EMI 与布局、热设计、可靠性工程不在范围内。知识库 20,596 条公式只用到约 120 条，7,522 张书内插图一张未用；跨书检索（17,292 块）尚未开放成可交互页面。这些不是「即将上线」，是没有排期。</p>
+          <p className="text-text-secondary leading-relaxed"><strong className="text-text-primary">已经做的：</strong>手册 18 阶 / 5 个阶段（建模与控制的完整主线 + 6 个专题）、前置知识 6 章（两本外部数学教材的显性化，含书内原图、动态视频与交互图）、S→Z 长篇专题 1 篇（逐条公式溯源）、Tustin 计算器 1 个（内核可单独复核）。</p>
+          <p className="text-text-secondary leading-relaxed mt-3"><strong className="text-text-primary">范围与还没做的：</strong>本手册只覆盖建模与控制，磁性元件设计、EMI 与布局、热设计、可靠性工程不在范围内。知识库 20,596 条公式只用到约 120 条，知识库的 7,522 张书内插图一张未用——前置知识模块用的 18 张插图来自两本<strong className="text-text-primary">外部</strong>数学教材，没有进入 RAG 库，因此不计入这组统计；跨书检索（17,292 块）尚未开放成可交互页面。这些不是「即将上线」，是没有排期。</p>
           <div className="mt-5 pt-5 border-t border-border text-sm text-text-muted leading-relaxed">
             技术栈与站群一致：Vite + React + TypeScript + Tailwind CSS；公式由 KaTeX 本地打包，无 CDN 依赖；
             计算内核为独立模块，页面与内核可分别复核。
@@ -123,6 +128,8 @@ export default function Home() {
 
         <div className="mt-10 flex items-center gap-2 text-sm text-text-muted">
           <ArrowRight className="w-4 h-4" />
+          <Link to="/math" className="text-primary-light hover:underline">先补前置知识</Link>
+          <span className="text-text-muted">或</span>
           <Link to="/handbook" className="text-primary-light hover:underline">从手册第 1 阶开始读</Link>
         </div>
       </div>

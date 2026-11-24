@@ -3,6 +3,8 @@ import Layout from './components/Layout'
 import Home from './pages/Home'
 import Handbook from './pages/Handbook'
 import Chapter from './pages/Chapter'
+import Prereq from './pages/Prereq'
+import PrereqChapter from './pages/PrereqChapter'
 import SToZ from './pages/SToZ'
 import Tustin from './pages/Tustin'
 import Feedback from './pages/Feedback'
@@ -28,6 +30,8 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/handbook" element={<Handbook />} />
           <Route path="/handbook/:slug" element={<Chapter />} />
+          <Route path="/math" element={<Prereq />} />
+          <Route path="/math/:slug" element={<PrereqChapter />} />
           <Route path="/learn/s-to-z" element={<SToZ />} />
           <Route path="/tools/tustin" element={<Tustin />} />
           <Route path="/feedback" element={<Feedback />} />

@@ -265,6 +265,57 @@ html[data-theme='sea-salt'] { --color-primary-dark: #d4e9ea; }
   .legend { display: flex; flex-wrap: wrap; gap: 1.25rem; font-size: .75rem; color: var(--color-text-secondary); margin-top: .8rem; }
   .legend i { display: inline-block; width: 18px; border-top: 2px solid; vertical-align: middle; margin-right: .35rem; }
   .eq-pre { font-family: var(--font-mono); font-size: .85rem; color: var(--color-primary-light); white-space: pre-wrap; word-break: break-all; line-height: 1.8; }
+
+  /* ── 本站：前置知识模块（图 / 视频 / 交互组件） ───────────────────── */
+  /* 书内原图与本站自制素材都用 .prereq-figure 承载，但靠 figcaption 里的
+     .prereq-fig-credit 分开标注——读者一眼能看出哪个是书里的、哪个是本站做的。 */
+  .prereq-figure { margin: 1.75rem 0; }
+  .prereq-figure img,
+  .prereq-figure video {
+    display: block; height: auto;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border); border-radius: 8px;
+  }
+  /* 书内插图原尺寸从 77×82 到 587×303 不等，铺满 860px 会糊成马赛克。
+     默认按原始宽度居中显示，加载后再按「不超过 2 倍原始宽」放宽（见 BookFigure 的 onLoad）。 */
+  .prereq-figure img { width: auto; max-width: 100%; margin: 0 auto; }
+  .prereq-figure video { width: 100%; background: #0a0a0a; }
+  .prereq-figure figcaption { margin-top: .55rem; }
+  .prereq-fig-caption {
+    display: block; font-size: .82rem; line-height: 1.75; color: var(--color-text-secondary);
+  }
+  .prereq-fig-credit {
+    display: block; margin-top: .3rem; padding-left: .6rem;
+    border-left: 2px solid var(--color-primary);
+    font-size: .74rem; line-height: 1.7; color: var(--color-text-muted);
+  }
+
+  .prereq-demo { margin: 1.75rem 0; }
+  .prereq-demo-canvas {
+    border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden;
+    background: var(--color-surface);
+  }
+  .prereq-demo-controls {
+    display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1.5rem;
+    margin: .7rem 0 .45rem; padding: .6rem .9rem;
+    border: 1px solid var(--color-border); border-radius: 8px;
+    background: var(--color-surface);
+  }
+  .prereq-demo-param { display: flex; align-items: center; gap: .55rem; }
+  .prereq-demo-param-label { font-size: .78rem; color: var(--color-text-secondary); white-space: nowrap; }
+  .prereq-demo-param-label b {
+    font-family: var(--font-mono); color: var(--color-primary-light); margin-left: .35rem;
+  }
+  .prereq-demo-param input[type='range'] { width: 130px; accent-color: var(--color-primary-light); }
+  .prereq-demo-play {
+    font-family: var(--font-mono); font-size: .76rem; padding: .3rem .85rem;
+    border: 1px solid var(--color-border); border-radius: 99px;
+    background: var(--color-surface-elevated); color: var(--color-text-secondary); cursor: pointer;
+    transition: border-color .2s, color .2s;
+  }
+  .prereq-demo-play:hover { border-color: var(--color-primary-light); color: var(--color-primary-light); }
+  .prereq-demo-readout { font-size: .76rem; color: var(--color-text-muted); }
+  .prereq-demo-readout b { font-family: var(--font-mono); color: var(--color-primary-light); }
 }
 
 @layer utilities {

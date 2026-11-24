@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Menu, X, House, BookOpen, Calculator, Layers, Library, MessageSquare } from 'lucide-react'
+import { Menu, X, House, BookOpen, Calculator, Layers, Library, GraduationCap, MessageSquare } from 'lucide-react'
 import BrandMark from './BrandMark'
 import VersionBadge from './VersionBadge'
 import ThemeSwitcher from './ThemeSwitcher'
 
 const navLinks = [
   { path: '/', label: '首页', icon: Layers },
+  { path: '/math', label: '前置', icon: GraduationCap },
   { path: '/handbook', label: '手册', icon: Library },
   { path: '/learn/s-to-z', label: '培训', icon: BookOpen },
   { path: '/tools/tustin', label: '工具', icon: Calculator },
