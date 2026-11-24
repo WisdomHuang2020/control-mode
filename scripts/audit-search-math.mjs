@@ -111,19 +111,50 @@ const page = await browser.newPage({ viewport: { width: 375, height: 1200 } })
 await page.goto(`${base}/search?q=${encodeURIComponent('右半平面')}`, { waitUntil: 'domcontentloaded' })
 await page.waitForSelector('button:has-text("公式")', { timeout: 30000 })
 await page.click('button:has-text("公式")')
-await page.waitForTimeout(6000)
+// 不能固定 sleep：线上检索要拉数 MB 索引，6 秒等不到就切页签，量到的是空列表 ——
+// 表现为 rendered=0 rawPre=0，看着像「通过」，其实一条公式都没验（踩过一次）。
+// 改成等结果落定：要么出现公式卡片，要么明确「没有命中」；超时才算失败。
+let tabSettled = 'ok'
+try {
+  await page.waitForFunction(
+    () => {
+      const t = document.body.innerText || ''
+      return (
+        document.querySelectorAll('.snippet-display-math').length > 0 ||
+        document.querySelectorAll('article').length > 0 ||
+        t.includes('没有命中')
+      )
+    },
+    { timeout: 90000, polling: 250 }
+  )
+  // 卡片出现后 KaTeX 还要一次渲染，给一帧余量
+  await page.waitForTimeout(800)
+} catch {
+  tabSettled = 'timeout'
+}
 const f = await page.evaluate(() => {
   const vw = document.documentElement.clientWidth
+  const cards = [...document.querySelectorAll('article')]
+  // 卡片里的 <pre> 有两种，不能混为一谈：
+  //   · 落在 .snippet-display-math 里的，是 <details> 折叠的「LaTeX 原文」，有意提供的；
+  //   · 落在它外面的，才是 KaTeX 渲染失败后回退的源码 —— 这个才是要盯的数。
+  const pres = [...document.querySelectorAll('article pre')]
   return {
+    cards: document.querySelectorAll('.snippet-display-math').length,
     rendered: document.querySelectorAll('.snippet-display-math .katex').length,
-    rawPre: document.querySelectorAll('article pre').length,
+    fallback: pres.filter((p) => !p.closest('.snippet-display-math')).length,
+    source: pres.filter((p) => p.closest('.snippet-display-math')).length,
+    empty: cards.length === 0,
     docOverflow: document.documentElement.scrollWidth > vw,
   }
 })
+// 一条公式都没验到，等于没验（rendered=0 曾经因为固定 sleep 反而「通过」过，被骗了一次）。
+const tabFail =
+  tabSettled !== 'ok' || f.docOverflow || f.rendered === 0 || f.cards === 0
 console.log(
-  `${!f.docOverflow ? '✔' : '✘'} [375px] 公式页签  rendered=${f.rendered} rawPre=${f.rawPre} docOverflow=${f.docOverflow}`
+  `${!tabFail ? '✔' : '✘'} [375px] 公式页签  卡片=${f.cards} 渲染=${f.rendered} 失败回退=${f.fallback} 原文折叠=${f.source} 溢出=${f.docOverflow} settled=${tabSettled}`
 )
-if (f.docOverflow) failed++
+if (tabFail) failed++
 await page.close()
 
 await browser.close()
