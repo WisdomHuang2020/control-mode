@@ -104,8 +104,23 @@ jobs:
             fi
           fi
 
-          # 上传前备份（失败不阻断）
-          $SSH_CMD "tar czf ~/webroot-backup-\$(date +%F-%H%M%S).tar.gz -C '$LH_ROOT' . 2>/dev/null || true"
+          # 上传前备份（失败不阻断）。
+          # 时间戳由**服务器**生成，与历史文件名口径一致（服务器本地时区，不是 runner 的 UTC）。
+          # 只有 tar 真正成功才回显文件名——用于下面判断「本次备份是否就位」。
+          BK_NAME=$($SSH_CMD "tar czf ~/webroot-backup-\$(date +%F-%H%M%S).tar.gz -C '$LH_ROOT' . 2>/dev/null && ls -1t ~/webroot-backup-[0-9]*.tar.gz | head -1") || true
+          if [ -n "$BK_NAME" ]; then
+            echo "已备份：$BK_NAME"
+            # ── 备份保留策略：只留最近 3 个 ──
+            # 文件名模式 webroot-backup-[0-9]* 里那个 [0-9] 是刻意的：同机还部署着入口站，
+            # 它的备份叫 webroot-backup-entrance-<时间>.tar.gz，backup- 后面是 e 不是数字，
+            # 所以这个模式**不会**匹配到它。两个工作流各清各的，互不越界。
+            # 「保留最近 3 个」= ls -t 排序后从第 4 个开始删。
+            # 保险：只有最新备份能被 tar 读通才执行清理——备份坏了又把旧备份删光，就真没退路了。
+            $SSH_CMD 'NEWEST=$(ls -1t ~/webroot-backup-[0-9]*.tar.gz 2>/dev/null | head -1); if [ -n "$NEWEST" ] && tar tzf "$NEWEST" >/dev/null 2>&1; then ls -1t ~/webroot-backup-[0-9]*.tar.gz 2>/dev/null | tail -n +4 | while IFS= read -r old; do rm -f -- "$old" && echo "已清理旧备份：$old"; done; echo "备份清理完成，保留最近 3 个"; else echo "最新备份校验失败，跳过清理（宁可占空间也不删可用备份）"; fi' \
+              || echo "::warning::备份清理出错，不阻断部署（清理只是家务，不能让它挡住上线）"
+          else
+            echo "::warning title=备份失败::上传前备份未成功，部署继续（与原行为一致），本次跳过清理。"
+          fi
 
           # tar over ssh，不依赖 rsync；不做删除，避免线上 rm 的风险不对称。
           tar czf - -C dist . | $SSH_CMD "tar xzf - --no-same-owner -C '$LH_ROOT'"
